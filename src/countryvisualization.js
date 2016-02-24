@@ -11,10 +11,33 @@ export default class CountryVisualization{
 	}
 
 	constructor(canvas, countryData){
+		this.currentFilters = {};
 		paper.setup(canvas);
 		this.drawVisStudio();
 		this.drawCountries(countryData);
 		paper.view.draw();
+	}
+
+	checkFilter(ball){
+		for(let prop in this.currentFilters){
+			if(ball[prop] < this.currentFilters[prop]){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	filter(prop, value){
+		this.currentFilters[prop] = value;
+		for(let idx in this.balls){
+			let ball = this.balls[idx];
+
+			if(!this.checkFilter(ball)){
+				ball.path.visible = false;
+			}else{
+				ball.path.visible = true;
+			}
+		}
 	}
 
 	drawCountries(data){
@@ -48,36 +71,5 @@ export default class CountryVisualization{
 		ball.fillColor = "black";
 		this.visStudio = ball;
 	}
-
-
-
-	genFractal(a, b, c, depth) {
-		if (depth === 0) return;
-		else {
-			var ab = (a.add(b)).divide(2);
-			var ac = (a.add(c)).divide(2);
-			var bc = (b.add(c)).divide(2);
-			this.drawTriangle(ab, ac, bc);
-			paper.view.draw();
-
-			this.genFractal(a, ab, ac, depth - 1);
-			this.genFractal(ab, b, bc, depth - 1);
-			this.genFractal(ac, bc, c, depth - 1);
-		}
-	}
-
-	drawTriangle(a, b, c) {
-		var path = new paper.Path();
-		path.strokeColor = 'black';
-		path.moveTo(a);
-		path.lineTo(b);
-		path.lineTo(c);
-		path.lineTo(a);
-		paper.view.draw();
-	}
-
-
-
-
 
 }
