@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 
 import $ from 'jquery';
 
@@ -6,28 +6,46 @@ export default class DataStore{
 	
 	
 
-	getCountryDatas(){
-		return this.doRequest("getCountryDatas");
+	getCountryDatas(date){
+		var ret = null;
+		if(date){
+			ret = this._doRequest("getCountryDatas/"+date);
+		}else{
+			ret = this._doRequest("getCountryDatas");
+		}
+		return ret;
 	}
 
-	getCityData(){
-		return this.doRequest("getCityData");
+	getCityDatas(date){
+		var ret = null;
+		if(date){
+			ret = this._doRequest("getCityDatas/"+date);
+		}else{
+			ret = this._doRequest("getCityDatas");
+		}
+		return ret;
 	}
 
-	getDemographicData(){
-		return this.doReqeuest("getDemographicData");
+	getDemographicDatas(date){
+		var ret = null;
+		if(date){
+			ret = this._doRequest("getDemographicDatas/"+date);
+		}else{
+			ret = this._doRequest("getDemographicDatas");
+		}
+		return ret;
 	}
 
 	getCountries(){
-		return this.doRequest("getCountries");
+		return this._doRequest("getCountries");
 	}
 
 	getCountryData(country){
-		return this.doRequest("getCountryData/"+country);
+		return this._doRequest("getCountryData/"+country);
 	}
 
 
-	doRequest(dataType){
+	_doRequest(dataType){
 		return $.ajax({
 			url: "http://localhost:3000/"+dataType,
 			type: 'GET',
@@ -40,7 +58,7 @@ export default class DataStore{
 				},{
 					type: 'danger'
 				}); }
-			})
+			});
 	}
 
 }

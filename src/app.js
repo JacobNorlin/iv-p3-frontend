@@ -2,8 +2,10 @@
 import $ from 'jquery';
 import Parser from './parser.js';
 import paper from 'paper';
-import AmbientVisualization from './ambientvisualization.js';
+import CountryVisualization from './countryvisualization.js';
 import DataStore from './datastore.js';
+import Rx from 'rx';
+import _ from 'lodash';
 // var file = new XMLHttpRequest();
 // file.open("GET", "file://../data/Facebook Insights Data Export - Visualization Studio VIC - 2014-01-01 - 2014-02-27.csv");
 // console.log(file);	
@@ -13,31 +15,56 @@ import DataStore from './datastore.js';
 
 var ds = new DataStore();
 
-ds.getCountries().done(foo);
+function loadCountryDatas(){
+	ds.getCountryDatas("2015-04-02").done(foo);
+}
+function loadCityDatas(){
+	ds.getCityDatas("2015-04-02").done(foo);
+}
+function loadDemographicDatas(){
+	ds.getDemographicDatas("2015-04-02").done(foo);
+}
+
+var av = null;
 
 function foo(data) {
-	console.log(data);
-	// var canvas = document.getElementById('myCanvas');
-	// let av = new AmbientVisualization(canvas);
-	// av.drawCountryView(data.lifetimeLikesByCountry["2/21/2014"]);
-	// av.drawVisStudio();
+
+	if(av){
+		av.remove();
+	}
+
+
+	// let countryData = _.mapKeys(data, (value, key) => {
+	// 	return value.country;
+	// });
+	let countryData = data;
+	let cv = document.getElementById('myCanvas');
+	console.log(countryData);
+	av = new CountryVisualization(cv, countryData);
+
+
+
+	var onFrame = function onFrame(event){
+		timer += event.delta;
+		if(timer > 2){
+			timer = 0;
+			_.forEach(av.balls, ball => {
+				ball.fireLike();
+			})
+		}
+	};
+	// paper.view.onFrame = onFrame;
+}
+
+window.onload = function(){
+	document.getElementById('countries').onclick = loadCountryDatas;
+	document.getElementById('cities').onclick = loadCityDatas;
+	document.getElementById('demographics').onclick = loadDemographicDatas;
+
 }
 
 
+var timer = 0;
 
-
-// let parser = new Parser();
-
-// parser.parse("https://dl.dropboxusercontent.com/u/7511501/Facebook%20Insights%20Data%20Export%20-%20Visualization%20Studio%20VIC%20-%202014-01-01%20-%202014-02-27.csv", foo);
-
-// function test(data){
-// 	console.log(data);
-// }
-
-
-
-// $.getJSON('http://localhost:3000/getData', (data, status) => {
-// 	console.log(data);
-// });
 
 	
