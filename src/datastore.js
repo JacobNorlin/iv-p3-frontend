@@ -1,6 +1,7 @@
 "use strict";
 
 import $ from 'jquery';
+import {resturl} from './resturl.js';
 
 export default class DataStore{
 	
@@ -46,8 +47,9 @@ export default class DataStore{
 
 
 	_doRequest(dataType){
+		console.log(resturl+dataType);
 		return $.ajax({
-			url: "http://localhost:3000/"+dataType,
+			url: resturl+dataType,
 			type: 'GET',
 			crossDomain: true,
 			dataType: 'jsonp',
