@@ -27,8 +27,11 @@ export default class DataFetcher{
 				return _(countryTuple[0])
 				.zip(countryTuple[1])
 				.map(t => {
-					t[0].lifetime_likes_dx = t[0].lifetime_likes - t[1].lifetime_likes;
-					t[0].weekly_reach_dx = t[0].weekly_reach - t[1].weekly_reach;
+					if(t[1]){
+						t[0].lifetime_likes_dx = t[0].lifetime_likes - t[1].lifetime_likes;
+						t[0].weekly_reach_dx = t[0].weekly_reach - t[1].weekly_reach;
+					}
+					
 					return t[0];
 				})
 				.groupBy(t => {

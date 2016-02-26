@@ -12,27 +12,37 @@ export default class CountryVisualization{
 		paper.project.clear();
 	}
 
-	constructor(canvas, specData, genericData){
-		this.currentFilters = {};
-		paper.setup(canvas);
 
+	constructor(canvas, type, specData, genericData){
+		this.currentFilters = {};
+		this.type = type;
+		this.specData = specData;
+		paper.setup(canvas);
+		this._getTypes(specData, type);
 		// let background = new paper.Path.Rectangle(paper.view.center, new paper.Size(3000,3000));
 		// background.fillColor = "black";
 
 		this.zoom = 0.8;
 		this.visStudio = new VisualisationStudio(genericData);
-		this.balls = this.createBalls(specData);
+		this.balls = this._createBalls(specData);
 		console.log(this.balls);
 		paper.view.draw();
 	}
 
-	update(specData, genericData){
+	update(newSpecData, genericData){
+
+		let currentStructures = this._getType(this.specData, this.type);
+		let newStructures = this._getType(newSpecData, this.type);
+		let difference = _.difference(newStructures, currentStructures);
+
+
+
 		for(let ball of this.balls){
 			ball.data = specData;
 		}
 	}
 
-	checkFilter(ball){
+	_checkFilter(ball){
 		for(let prop in this.currentFilters){
 			if(ball.path.data[prop] < this.currentFilters[prop]){
 				return false;
@@ -45,7 +55,7 @@ export default class CountryVisualization{
 		this.currentFilters[prop] = value;
 		for(let ball of this.balls){
 
-			if(!this.checkFilter(ball)){
+			if(!this._checkFilter(ball)){
 				ball.setVisibility(false);
 			}else{
 				ball.setVisibility(true);
@@ -53,39 +63,48 @@ export default class CountryVisualization{
 		}
 	}
 
-	createBalls(specData){
-		console.log(specData);
+	_createBalls(specData){
+		// console.log(specData);
 		let maxRange = 500;
-		let tracks = specData.length;
+		let tracks = specData.length > 1 ? specData.length : specData[0].length;
 		let trackRadiusDiff = maxRange/tracks+1;
 		let balls = new Array();
-		for(let i = 0; i < specData.length; i++){
-			for(let country of specData[i]){
-				let r = i*trackRadiusDiff;
-				let pos = randomPointOnCircle(r, paper.view.center, 0);
-				let ball = new DataBall(country, pos);
-				balls.push(ball);
+		if(specData.length > 1){
+			for(let i = 0; i < tracks; i++){
+				for(let country of specData[i]){
+					balls.push(this._createBall(i, trackRadiusDiff, country));
+				}
+			}	
+		}else{
+			for(let i = 0; i < specData[0].length; i++){
+				balls.push(this._createBall(i, trackRadiusDiff, specData[0][i]));
 			}
 		}
+		
 		return balls;
-		// return _.mapValues(specData, (value, key) => {
-		// 	let r = maxRange/value.weekly_reach;
-		// 	r = Math.max(r, 50);
-		// 	r = Math.min(r, maxRange);
-		// 	let pos = randomPointOnCircle(r, this.visStudio.position);
-		// 	let ball = new DataBall(value, pos);
-		// 	console.log(ball.foo);
-		// 	// ball.onFrame = () => {
-		// 	// 	ball.move();
-		// 	// }
-		// 	return ball;
-		// });
 	}
-
 
 	changeZoom(newZoom){
 		// this.zoom += newZoom;
 		paper.view.zoom += newZoom;
 	}
+
+	_createBall(i, trackRadiusDiff, country){
+		let r = i*trackRadiusDiff;
+		let pos = randomPointOnCircle(r, paper.view.center, 0);
+		let ball = new DataBall(country, pos);
+		return ball;
+	}
+
+	_getTypes(specData, type){
+		return _(specData)
+			.flatten()
+			.map(row => {
+				return row[type];
+			}).value()
+	}
+
+
+
 
 }

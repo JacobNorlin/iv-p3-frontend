@@ -24,9 +24,11 @@ window.onload = function(){
 	var likeNumber = document.getElementById('likeNumber');
 
 	let timeline = document.getElementById('timelineFilter');
+	var timeNumber = document.getElementById('currentTime');
 
-	const firstDate = new Date("2014-01-01").getTime();
-	const lastDate = new Date("2016-02-15").getTime();
+	
+	const firstDate = new Date("2014-01-08").getTime();
+	const lastDate = new Date("2016-02-14").getTime();
 	const oneDay = 24*60*60*1000;
 	const dayRange = Math.round((lastDate - firstDate)/oneDay);
 	timeline.max = dayRange;
@@ -41,20 +43,26 @@ window.onload = function(){
 	var currentRoute = ds.routes.getCountryDatas;
 	var currentSelectedDate = "2015-03-10";
 
+
+	timeline.oninput = (e) => {
+		timeNumber.innerHTML = getDate(e.srcElement.value);
+	};
+
+
 	// ds.getPostData("2015-03-01").then((d) => {console.log(d)});
 	// ds.getGenericDatas("2015-03-05").then((d) => {console.log(d)});
 
 	function loadCountryDatas(){
 		currentRoute = ds.routes.getCountryDatas;
-		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo);
+		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo, "country");
 	}
 	function loadCityDatas(){
 		currentRoute = ds.routes.getCityDatas;
-		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo);
+		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo, "city");
 	}
 	function loadDemographicDatas(){
 		currentRoute = ds.routes.getDemographicDatas;
-		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo);
+		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo, "demographic");
 	}
 
 	let timelineChange = Rx.Observable.fromEvent(timeline, 'change')
@@ -104,7 +112,7 @@ window.onload = function(){
 			av.changeZoom(-0.3);
 		}
 	})
-	function foo(data) {
+	function foo(data, type) {
 		currentSelectedDate = new Date(data[0][0].date).toDateString();
 		if(av){
 			av.remove();
@@ -123,12 +131,12 @@ window.onload = function(){
 		.value()[0];
 		setUpFilters(maxLikes, maxReach);
 
-
+		timeNumber.innerHTML = currentSelectedDate;
 	// let countryData = _.mapKeys(data, (value, key) => {
 	// 	return value.country;
 	// });
 	let cv = document.getElementById('myCanvas');
-	av = new CountryVisualization(cv, data);
+	av = new CountryVisualization(cv, type, data);
 
 
 
