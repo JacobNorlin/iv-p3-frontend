@@ -39,21 +39,22 @@ window.onload = function(){
 
 	var ds = new DataFetcher();
 	var currentRoute = ds.routes.getCountryDatas;
+	var currentSelectedDate = "2015-03-10";
 
 	// ds.getPostData("2015-03-01").then((d) => {console.log(d)});
 	// ds.getGenericDatas("2015-03-05").then((d) => {console.log(d)});
 
 	function loadCountryDatas(){
 		currentRoute = ds.routes.getCountryDatas;
-		ds.getCountryDatas("2015-04-02").subscribe(foo);
+		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo);
 	}
 	function loadCityDatas(){
 		currentRoute = ds.routes.getCityDatas;
-		ds.getCityDatas("2015-04-02").subscribe(foo);
+		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo);
 	}
 	function loadDemographicDatas(){
 		currentRoute = ds.routes.getDemographicDatas;
-		ds.getDemographicDatas("2015-04-02").subscribe(foo);
+		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo);
 	}
 
 	let timelineChange = Rx.Observable.fromEvent(timeline, 'change')
@@ -104,7 +105,7 @@ window.onload = function(){
 		}
 	})
 	function foo(data) {
-		console.log(data);
+		currentSelectedDate = new Date(data[0][0].date).toDateString();
 		if(av){
 			av.remove();
 		}

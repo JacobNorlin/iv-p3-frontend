@@ -53,31 +53,31 @@ export default class DataFetcher{
 	}
 
 	getCountryDatas(date){
-		return this.getData(this.routes.getCountryDatas, date);
+		return this.getDxData(this.routes.getCountryDatas, date);
 	}
 
 	getGenericDatas(date){
-		return this.getData(this.routes.getGenericDatas, date);
+		return this.getDxData(this.routes.getGenericDatas, date);
 	}
 
 	getPostData(date){
-		return this.getData(this.routes.getPostData, date);
+		return this.getDxData(this.routes.getPostData, date);
 	}
 
 	getCityDatas(date){
-		return this.getData(this.routes.getCityDatas, date);
+		return this.getDxData(this.routes.getCityDatas, date);
 	}
 
 	getDemographicDatas(date){
-		return this.getData(this.routes.getDemographicDatas, date);
+		return this.getDxData(this.routes.getDemographicDatas, date);
 	}
 
 	getCountries(){
-		return this._doRequest("getCountries");
+		return this.getDxData("getCountries");
 	}
 
 	getCountryData(country){
-		return this._doRequest("getCountryData/"+country);
+		return this.getDxData("getCountryData/"+country);
 	}
 
 

@@ -55,6 +55,7 @@ export default class CountryVisualization{
 	}
 
 	createBalls(specData){
+		console.log(specData);
 		let maxRange = 500;
 		let tracks = specData.length;
 		let trackRadiusDiff = maxRange/tracks+1;
