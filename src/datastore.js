@@ -17,6 +17,26 @@ export default class DataStore{
 		return ret;
 	}
 
+	getGenericDatas(date){
+		var ret = null;
+		if(date){
+			ret = this._doRequest("getGenericDatas/"+date);
+		}else{
+			ret = this._doRequest("getGenericData");
+		}
+		return ret;
+	}
+
+	getPostData(date){
+		var ret = null;
+		if(date){
+			ret = this._doRequest("getPostData/"+date);
+		}else{
+			ret = this._doRequest("getPostData");
+		}
+		return ret;
+	}
+
 	getCityDatas(date){
 		var ret = null;
 		if(date){

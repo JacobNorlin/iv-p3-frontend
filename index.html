@@ -7,14 +7,19 @@
     	<script src="./build/bundle.js"></script>
     	<canvas id="myCanvas" width="1000px" height="750px "> </canvas>
 
-    	<button id='countries'>Countries</button>
-        <button id='cities'>Cities</button>
-        <button id='demographics'>Demographics</button>
-        <div id="reachNumber"></div>
-        <input type="range" id="reachFilter" >Filter reach
-        <div id="likeNumber"></div>
-        <input type="range" id="likeFilter">Filter likes
-
-    	</div>
+        <div id="viewStructures">
+        	<button id='countries'>Countries</button>
+            <button id='cities'>Cities</button>
+            <button id='demographics'>Demographics</button>
+        </div>
+        <div id="filters">
+            <div id="reachNumber"></div>
+            <input type="range" id="reachFilter" >Filter reach
+            <div id="likeNumber"></div>
+            <input type="range" id="likeFilter">Filter likes
+            <div id="currentTime"></div>
+            <input type="range" id="timelineFilter" style="width:1000px"></input>
+        </div>  
+    	
     </body>
 </html>

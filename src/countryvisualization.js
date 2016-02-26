@@ -3,6 +3,8 @@
 import paper from 'paper';
 import _ from 'lodash';
 import DataBall from './databall.js';
+import {randomPointOnCircle} from './drawutils.js';
+import VisualisationStudio from './visualisationstudio.js';
 
 export default class CountryVisualization{
 	
@@ -10,12 +12,24 @@ export default class CountryVisualization{
 		paper.project.clear();
 	}
 
-	constructor(canvas, countryData){
+	constructor(canvas, specData, genericData){
 		this.currentFilters = {};
 		paper.setup(canvas);
-		this.drawVisStudio();
-		this.drawCountries(countryData);
+
+		// let background = new paper.Path.Rectangle(paper.view.center, new paper.Size(3000,3000));
+		// background.fillColor = "black";
+
+		this.zoom = 1;
+		this.visStudio = new VisualisationStudio(genericData);
+		this.balls = this.createBalls(specData);
+		console.log(this.balls);
 		paper.view.draw();
+	}
+
+	update(specData, genericData){
+		for(let ball of this.balls){
+			ball.data = specData;
+		}
 	}
 
 	checkFilter(ball){
@@ -40,36 +54,22 @@ export default class CountryVisualization{
 		}
 	}
 
-	drawCountries(data){
-		this.balls = _.mapValues(data, (value, key) => {
-			let pos = this.randomPointOnCircle(Math.max(1000/value.weekly_reach,50), this.visStudio.position);
+	createBalls(specData){
+		let maxRange = 450;
+		return _.mapValues(specData, (value, key) => {
+			let r = maxRange/value.weekly_reach;
+			r = Math.max(r, 50);
+			r = Math.min(r, maxRange);
+			let pos = randomPointOnCircle(r, this.visStudio.position);
 			let ball = new DataBall(value, pos);
 			return ball;
 		});
 	}
 
-	randomPointOnCircle(radius, center){
-		let angle = Math.random()*(Math.PI*2); //Random angle
-		let x = Math.cos(angle)*radius;
-		let y = Math.sin(angle)*radius;
-		let offset = new paper.Point(x,y);
-		let pos = center.add(offset);
-		return pos;
-	}
 
-	pointOnCircle(radius, center, angle){
-		let x = Math.cos(angle)*radius;
-		let y = Math.sin(angle)*radius;
-		let offset = new paper.Point(x,y);
-		let pos = center.add(offset);
-		return pos;
-	}
-
-
-	drawVisStudio(data){
-		var ball = paper.Path.Circle(paper.view.center, 10);
-		ball.fillColor = "black";
-		this.visStudio = ball;
+	changeZoom(newZoom){
+		// this.zoom += newZoom;
+		paper.view.zoom += newZoom;
 	}
 
 }

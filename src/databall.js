@@ -5,30 +5,28 @@ export default class DataBall{
 	
 	constructor(data, pos){
 		this.radius = this.calculateRadius(data.lifetime_likes);
-		this.weeklyReach = data.weekly_reach;
-		this.lifetimeLikes = data.lifetime_likes;
 		this.path = new paper.Path.Circle(pos, this.radius);
+		this.path.data = data;
 		this.path.onFrame = this.onFrame;
 		this.path.fillColor = {
-			hue: Math.random() * 360,
+			hue: 200- 20*Math.random(),
 			saturation: 1,
 			brightness: 1,
 			opacity: 1.5-Math.random()
 		};
 		this.path.timer = 0;
 		this.path.fireLike = this.fireLike;
-		this.path.weeklyReach = this.weeklyReach;
-
 	}
 
 	calculateRadius(lifetimeLikes){
-		return Math.ceil(Math.log(lifetimeLikes))*2;
+		let r = Math.ceil(Math.log(lifetimeLikes))*2;
+		return r > 4 ? r : 4	;
 	}
 
 	fireLike(){
 		let like = new paper.Path.Circle(this.position, 2);
-		like.strokeColor = "red",
-		like.opacity = 0.8;
+		like.strokeColor = "white",
+		like.opacity = 0.4;
 		like.timer = 0;
 		paper.view.draw();
 		let onFrame = function(event){
@@ -41,7 +39,7 @@ export default class DataBall{
 			this.scale(1.05);
 			this.opacity -= 0.005;
 			this.timer += event.delta;
-			if(this.opacity <= 0.3){
+			if(this.opacity <= 0.02){
 				this.remove();
 				this.timer = 0;
 			}
@@ -50,9 +48,8 @@ export default class DataBall{
 	}
 
 	onFrame(event){
-
 		this.timer += event.delta;
-		if(this.timer > 384/this.weeklyReach){
+		if(this.timer > 384/this.data.weekly_reach){
 			this.timer = 0;
 			this.fireLike();
 		}

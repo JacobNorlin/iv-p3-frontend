@@ -14,12 +14,16 @@ import _ from 'lodash';
 // })
 
 
+
+
 window.onload = function(){
 	document.getElementById('countries').onclick = loadCountryDatas;
 	document.getElementById('cities').onclick = loadCityDatas;
 	document.getElementById('demographics').onclick = loadDemographicDatas;
 
 	var ds = new DataStore();
+	ds.getPostData("2015-03-01").then((d) => {console.log(d)});
+	ds.getGenericDatas("2015-03-05").then((d) => {console.log(d)});
 
 	function loadCountryDatas(){
 		ds.getCountryDatas("2015-04-02").done(foo);
@@ -64,6 +68,13 @@ window.onload = function(){
 	var av = null;
 
 
+	$(document).keypress((e) => {
+		if(e.keyCode === 122){
+			av.changeZoom(0.3);
+		}else if(e.keyCode === 120){
+			av.changeZoom(-0.3);
+		}
+	})
 	function foo(data) {
 
 		if(av){
