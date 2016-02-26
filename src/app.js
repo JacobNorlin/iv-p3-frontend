@@ -74,7 +74,7 @@ window.onload = function(){
 		});
 	reachChange.subscribe(x => {
 		reachNumber.innerHTML = x;
-		av.filter('weeklyReach', x);
+		av.filter('weekly_reach', x);
 		
 	});
 
@@ -84,7 +84,7 @@ window.onload = function(){
 			});
 		likeChange.subscribe(x => {
 			likeNumber.innerHTML = x;
-			av.filter('lifetimeLikes', x);
+			av.filter('lifetime_likes', x);
 		});
 	function setUpFilters(maxLikes, maxReach){
 		reachFilter.max = maxReach;

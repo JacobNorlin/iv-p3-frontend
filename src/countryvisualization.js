@@ -34,7 +34,7 @@ export default class CountryVisualization{
 
 	checkFilter(ball){
 		for(let prop in this.currentFilters){
-			if(ball[prop] < this.currentFilters[prop]){
+			if(ball.path.data[prop] < this.currentFilters[prop]){
 				return false;
 			}
 		}
@@ -43,13 +43,12 @@ export default class CountryVisualization{
 
 	filter(prop, value){
 		this.currentFilters[prop] = value;
-		for(let idx in this.balls){
-			let ball = this.balls[idx];
+		for(let ball of this.balls){
 
 			if(!this.checkFilter(ball)){
-				ball.path.visible = false;
+				ball.setVisibility(false);
 			}else{
-				ball.path.visible = true;
+				ball.setVisibility(true);
 			}
 		}
 	}

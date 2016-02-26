@@ -37,6 +37,12 @@ export default class DataBall{
 		// console.log(this.path.data.rotationSpeed);
 	}
 
+	setVisibility(val){
+		this.path.visible = val;
+		this.path.trail.visible = val;
+		this.path.toCenterLine.visible = val;
+	}
+
 	fireLike(){
 		let like = new paper.Path.Circle(this.position, 2);
 		like.strokeColor = "blue";
