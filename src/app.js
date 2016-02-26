@@ -3,7 +3,7 @@ import $ from 'jquery';
 import Parser from './parser.js';
 import paper from 'paper';
 import CountryVisualization from './countryvisualization.js';
-import DataStore from './datastore.js';
+import DataFetcher from './datastore.js';
 import Rx from 'rx';
 import _ from 'lodash';
 // var file = new XMLHttpRequest();
@@ -14,30 +14,58 @@ import _ from 'lodash';
 // })
 
 
-
-
 window.onload = function(){
 	document.getElementById('countries').onclick = loadCountryDatas;
 	document.getElementById('cities').onclick = loadCityDatas;
 	document.getElementById('demographics').onclick = loadDemographicDatas;
-
-	var ds = new DataStore();
-	ds.getPostData("2015-03-01").then((d) => {console.log(d)});
-	ds.getGenericDatas("2015-03-05").then((d) => {console.log(d)});
-
-	function loadCountryDatas(){
-		ds.getCountryDatas("2015-04-02").done(foo);
-	}
-	function loadCityDatas(){
-		ds.getCityDatas("2015-04-02").done(foo);
-	}
-	function loadDemographicDatas(){
-		ds.getDemographicDatas("2015-04-02").done(foo);
-	}
 	var reachFilter = document.getElementById('reachFilter');
 	var likeFilter = document.getElementById('likeFilter');
 	var reachNumber = document.getElementById('reachNumber');
 	var likeNumber = document.getElementById('likeNumber');
+
+	let timeline = document.getElementById('timelineFilter');
+
+	const firstDate = new Date("2014-01-01").getTime();
+	const lastDate = new Date("2016-02-15").getTime();
+	const oneDay = 24*60*60*1000;
+	const dayRange = Math.round((lastDate - firstDate)/oneDay);
+	timeline.max = dayRange;
+
+	function getDate(day){
+		let ms = firstDate+day*oneDay;
+		let date = new Date(ms);
+		return date.toDateString();
+	}
+
+	var ds = new DataFetcher();
+	var currentRoute = ds.routes.getCountryDatas;
+
+	// ds.getPostData("2015-03-01").then((d) => {console.log(d)});
+	// ds.getGenericDatas("2015-03-05").then((d) => {console.log(d)});
+
+	function loadCountryDatas(){
+		currentRoute = ds.routes.getCountryDatas;
+		ds.getCountryDatas("2015-04-02").subscribe(foo);
+	}
+	function loadCityDatas(){
+		currentRoute = ds.routes.getCityDatas;
+		ds.getCityDatas("2015-04-02").subscribe(foo);
+	}
+	function loadDemographicDatas(){
+		currentRoute = ds.routes.getDemographicDatas;
+		ds.getDemographicDatas("2015-04-02").subscribe(foo);
+	}
+
+	let timelineChange = Rx.Observable.fromEvent(timeline, 'change')
+		.map(event => {
+			return event.srcElement.value;
+		})
+		.map(getDate)
+		.flatMap(date => {
+			return ds.getDxData(currentRoute, date);
+		})
+		.subscribe(foo);
+
 
 	var reachChange = Rx.Observable.fromEvent(reachFilter, 'change')
 		.map(event => {
@@ -76,7 +104,7 @@ window.onload = function(){
 		}
 	})
 	function foo(data) {
-
+		console.log(data);
 		if(av){
 			av.remove();
 		}
@@ -100,7 +128,6 @@ window.onload = function(){
 	// });
 	let countryData = data;
 	let cv = document.getElementById('myCanvas');
-	console.log(countryData);
 	av = new CountryVisualization(cv, countryData);
 
 

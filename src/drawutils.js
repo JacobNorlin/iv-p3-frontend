@@ -20,4 +20,9 @@ function pointOnCircle(radius, center, angle){
 }
 
 
-export {randomPointOnCircle, pointOnCircle};
+function calculateRadius(lifetimeLikes){
+	let r = Math.ceil(Math.log(lifetimeLikes))*2;
+	return r > 4 ? r : 4	;
+}
+
+export {randomPointOnCircle, pointOnCircle, calculateRadius};

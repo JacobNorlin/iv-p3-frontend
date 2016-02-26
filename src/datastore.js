@@ -2,59 +2,65 @@
 
 import $ from 'jquery';
 import {resturl} from './resturl.js';
+import Rx from 'rx';
+import _ from 'lodash';
 
-export default class DataStore{
-	
-	
+export default class DataFetcher{
 
-	getCountryDatas(date){
+	constructor(){
+		this.routes = {
+			getCountryDatas: "getCountryDatas",
+			getGenericDatas: "getGenericDatas",
+			getCityDatas: "getCityDatas",
+			getPostData: "getCityDatas",
+			getDemographicDatas: "getDemographicDatas"
+		};
+	}
+	
+	getDxData(route, date){
+		let diffDate = new Date(new Date(date).getTime() - 7*1000*60*60*24).toDateString();
+		let firstDate = this.getData(route, date);
+		let secondDate = this.getData(route, diffDate);
+		return Rx.Observable.combineLatest(firstDate, secondDate)
+			.take(1)
+			.map(countryTuple => {
+				return _(countryTuple[0])
+				.zip(countryTuple[1])
+				.map(t => {
+					t[0].lifetime_likes_dx = t[0].lifetime_likes - t[1].lifetime_likes;
+					t[0].weekly_reach_dx = t[0].weekly_reach - t[1].weekly_reach;
+					return t[0];
+				}).value();
+			});
+	}
+
+	getData(route, date){
 		var ret = null;
 		if(date){
-			ret = this._doRequest("getCountryDatas/"+date);
+			return this._doRequest(route+"/"+date);
 		}else{
-			ret = this._doRequest("getCountryDatas");
+			return this._doRequest(route);
 		}
-		return ret;
+	}
+
+	getCountryDatas(date){
+		return this.getData(this.routes.getCountryDatas, date);
 	}
 
 	getGenericDatas(date){
-		var ret = null;
-		if(date){
-			ret = this._doRequest("getGenericDatas/"+date);
-		}else{
-			ret = this._doRequest("getGenericData");
-		}
-		return ret;
+		return this.getData(this.routes.getGenericDatas, date);
 	}
 
 	getPostData(date){
-		var ret = null;
-		if(date){
-			ret = this._doRequest("getPostData/"+date);
-		}else{
-			ret = this._doRequest("getPostData");
-		}
-		return ret;
+		return this.getData(this.routes.getPostData, date);
 	}
 
 	getCityDatas(date){
-		var ret = null;
-		if(date){
-			ret = this._doRequest("getCityDatas/"+date);
-		}else{
-			ret = this._doRequest("getCityDatas");
-		}
-		return ret;
+		return this.getData(this.routes.getCityDatas, date);
 	}
 
 	getDemographicDatas(date){
-		var ret = null;
-		if(date){
-			ret = this._doRequest("getDemographicDatas/"+date);
-		}else{
-			ret = this._doRequest("getDemographicDatas");
-		}
-		return ret;
+		return this.getData(this.routes.getDemographicDatas, date);
 	}
 
 	getCountries(){
@@ -68,7 +74,7 @@ export default class DataStore{
 
 	_doRequest(dataType){
 		console.log(resturl+dataType);
-		return $.ajax({
+		return Rx.Observable.fromPromise($.ajax({
 			url: resturl+dataType,
 			type: 'GET',
 			crossDomain: true,
@@ -80,7 +86,8 @@ export default class DataStore{
 				},{
 					type: 'danger'
 				}); }
-			});
+			})
+		);
 	}
 
 }

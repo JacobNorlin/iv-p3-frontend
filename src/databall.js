@@ -1,10 +1,11 @@
 "use strict";
 import paper from 'paper';
+import {calculateRadius} from './drawutils.js';
 
 export default class DataBall{
 	
 	constructor(data, pos){
-		this.radius = this.calculateRadius(data.lifetime_likes);
+		this.radius = calculateRadius(data.lifetime_likes);
 		this.path = new paper.Path.Circle(pos, this.radius);
 		this.path.data = data;
 		this.path.onFrame = this.onFrame;
@@ -18,24 +19,13 @@ export default class DataBall{
 		this.path.fireLike = this.fireLike;
 	}
 
-	calculateRadius(lifetimeLikes){
-		let r = Math.ceil(Math.log(lifetimeLikes))*2;
-		return r > 4 ? r : 4	;
-	}
-
 	fireLike(){
 		let like = new paper.Path.Circle(this.position, 2);
-		like.strokeColor = "white",
+		like.strokeColor = "blue",
 		like.opacity = 0.4;
 		like.timer = 0;
 		paper.view.draw();
 		let onFrame = function(event){
-			// let distToCenter = new paper.Path(this.position, paper.view.center);
-			// if(distToCenter.length < 10){
-			// 	console.log("removed");
-			// 	this.remove();
-			// }
-			// this.position = distToCenter.getPointAt(distToCenter.length-(distToCenter.length-5));
 			this.scale(1.05);
 			this.opacity -= 0.005;
 			this.timer += event.delta;
@@ -57,7 +47,8 @@ export default class DataBall{
 		let centerDistV = this.position.subtract(paper.view.center);
 		let curAngle = centerDistV.angleInRadians;
 		let dist = centerDistV.length;
-		let angle = curAngle+Math.PI/dist/10;
+		let angle = (curAngle+Math.PI/dist/30);
+		angle += (this.data.weekly_reach_dx*Math.PI/180)/1000;
 
 		let x = Math.cos(angle)*dist;
 		let y = Math.sin(angle)*dist;

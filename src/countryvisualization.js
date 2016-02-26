@@ -56,12 +56,21 @@ export default class CountryVisualization{
 
 	createBalls(specData){
 		let maxRange = 450;
+		let tracks = specData.length;
+		let trackRadius = maxRange/tracks;
+		for(let country of specData){
+			
+		}
 		return _.mapValues(specData, (value, key) => {
 			let r = maxRange/value.weekly_reach;
 			r = Math.max(r, 50);
 			r = Math.min(r, maxRange);
 			let pos = randomPointOnCircle(r, this.visStudio.position);
 			let ball = new DataBall(value, pos);
+			console.log(ball.foo);
+			// ball.onFrame = () => {
+			// 	ball.move();
+			// }
 			return ball;
 		});
 	}
