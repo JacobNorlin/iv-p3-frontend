@@ -76,7 +76,7 @@ window.onload = function(){
 		.subscribe(foo);
 
 
-	var reachChange = Rx.Observable.fromEvent(reachFilter, 'change')
+	var reachChange = Rx.Observable.fromEvent(reachFilter, 'input')
 		.map(event => {
 			return event.srcElement.value;
 		});
@@ -86,7 +86,7 @@ window.onload = function(){
 		
 	});
 
-	var likeChange = Rx.Observable.fromEvent(likeFilter, 'change')
+	var likeChange = Rx.Observable.fromEvent(likeFilter, 'input')
 			.map(event => {
 				return event.srcElement.value;
 			});
