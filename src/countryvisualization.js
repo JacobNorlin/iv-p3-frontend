@@ -3,7 +3,7 @@
 import paper from 'paper';
 import _ from 'lodash';
 import DataBall from './databall.js';
-import {randomPointOnCircle} from './drawutils.js';
+import {randomPointOnCircle,pointOnCircle} from './drawutils.js';
 import VisualisationStudio from './visualisationstudio.js';
 
 export default class CountryVisualization{
@@ -55,24 +55,30 @@ export default class CountryVisualization{
 	}
 
 	createBalls(specData){
-		let maxRange = 450;
+		let maxRange = 500;
 		let tracks = specData.length;
-		let trackRadius = maxRange/tracks;
-		for(let country of specData){
-			
+		let trackRadiusDiff = maxRange/tracks+1;
+		let balls = new Array();
+		for(let i = 0; i < specData.length; i++){
+			for(let country of specData[i]){
+				let r = i*trackRadiusDiff;
+				let pos = randomPointOnCircle(r, paper.view.center, 0);
+				let ball = new DataBall(country, pos);
+				balls.push(ball);
+			}
 		}
-		return _.mapValues(specData, (value, key) => {
-			let r = maxRange/value.weekly_reach;
-			r = Math.max(r, 50);
-			r = Math.min(r, maxRange);
-			let pos = randomPointOnCircle(r, this.visStudio.position);
-			let ball = new DataBall(value, pos);
-			console.log(ball.foo);
-			// ball.onFrame = () => {
-			// 	ball.move();
-			// }
-			return ball;
-		});
+		// return _.mapValues(specData, (value, key) => {
+		// 	let r = maxRange/value.weekly_reach;
+		// 	r = Math.max(r, 50);
+		// 	r = Math.min(r, maxRange);
+		// 	let pos = randomPointOnCircle(r, this.visStudio.position);
+		// 	let ball = new DataBall(value, pos);
+		// 	console.log(ball.foo);
+		// 	// ball.onFrame = () => {
+		// 	// 	ball.move();
+		// 	// }
+		// 	return ball;
+		// });
 	}
 
 

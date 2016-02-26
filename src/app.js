@@ -126,9 +126,8 @@ window.onload = function(){
 	// let countryData = _.mapKeys(data, (value, key) => {
 	// 	return value.country;
 	// });
-	let countryData = data;
 	let cv = document.getElementById('myCanvas');
-	av = new CountryVisualization(cv, countryData);
+	av = new CountryVisualization(cv, data);
 
 
 

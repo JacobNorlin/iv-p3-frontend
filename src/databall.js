@@ -17,6 +17,10 @@ export default class DataBall{
 		};
 		this.path.timer = 0;
 		this.path.fireLike = this.fireLike;
+		let f = 7/data.lifetime_likes_dx;
+		this.path.data.fireFreq = f < 0 ? Math.Infinity : f;
+		this.path.data.rotationSpeed = data.weekly_reach_dx*Math.PI/180;
+		console.log(this.path.data.rotationSpeed);
 	}
 
 	fireLike(){
@@ -39,7 +43,7 @@ export default class DataBall{
 
 	onFrame(event){
 		this.timer += event.delta;
-		if(this.timer > 384/this.data.weekly_reach){
+		if(this.timer > this.data.fireFreq){
 			this.timer = 0;
 			this.fireLike();
 		}
@@ -47,8 +51,12 @@ export default class DataBall{
 		let centerDistV = this.position.subtract(paper.view.center);
 		let curAngle = centerDistV.angleInRadians;
 		let dist = centerDistV.length;
-		let angle = (curAngle+Math.PI/dist/30);
-		angle += (this.data.weekly_reach_dx*Math.PI/180)/1000;
+		let angle = 0;
+		if(this.data.rotationSpeed >= 0){
+			angle = (curAngle+(Math.PI/dist/30)*(1+this.data.rotationSpeed*2));
+		}else{
+			angle = (curAngle+(Math.PI/dist/30)*(-1-this.data.rotationSpeed*2));
+		}
 
 		let x = Math.cos(angle)*dist;
 		let y = Math.sin(angle)*dist;

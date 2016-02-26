@@ -30,7 +30,16 @@ export default class DataFetcher{
 					t[0].lifetime_likes_dx = t[0].lifetime_likes - t[1].lifetime_likes;
 					t[0].weekly_reach_dx = t[0].weekly_reach - t[1].weekly_reach;
 					return t[0];
-				}).value();
+				})
+				.groupBy(t => {
+					return t.weekly_reach;
+				})
+				.toArray()
+				.sortBy(x => {
+					return x[0].weekly_reach;
+				})
+				.reverse()
+				.value();
 			});
 	}
 
