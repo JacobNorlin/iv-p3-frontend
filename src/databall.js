@@ -20,12 +20,26 @@ export default class DataBall{
 		let f = 7/data.lifetime_likes_dx;
 		this.path.data.fireFreq = f < 0 ? Math.Infinity : f;
 		this.path.data.rotationSpeed = data.weekly_reach_dx*Math.PI/180;
-		console.log(this.path.data.rotationSpeed);
+		this.path.trailTimer = 0;
+		let strokeColor = this.path.data.rotationSpeed >= 0 ? "#82CAFF" : "#FFB682";
+		this.path.trail = new paper.Path({
+			strokeColor: strokeColor,
+			strokeWidth: 1,
+			strokeCap: "round"
+		});
+		this.path.toCenterLine = new paper.Path({
+			strokeColor: strokeColor,
+			strokeWidth: 1,
+			strokeCap: "round"
+		});
+		this.path.toCenterLine.add(this.path.position);
+		this.path.toCenterLine.add(paper.view.center);
+		// console.log(this.path.data.rotationSpeed);
 	}
 
 	fireLike(){
 		let like = new paper.Path.Circle(this.position, 2);
-		like.strokeColor = "blue",
+		like.strokeColor = "blue";
 		like.opacity = 0.4;
 		like.timer = 0;
 		paper.view.draw();
@@ -47,13 +61,26 @@ export default class DataBall{
 			this.timer = 0;
 			this.fireLike();
 		}
+		this.toCenterLine.segments[0].point = this.position;
+		this.trailTimer += event.delta;
+		if(this.trailTimer > 0.1){
+			this.trailTimer = 0;	
+			var p = this.position;
+
+			// this.trail.smooth();
+
+			if(this.trail.segments.length > 100){
+				this.trail.removeSegment(0);	
+			}
+			this.trail.add(p);
+		}
 
 		let centerDistV = this.position.subtract(paper.view.center);
 		let curAngle = centerDistV.angleInRadians;
 		let dist = centerDistV.length;
 		let angle = 0;
 		if(this.data.rotationSpeed >= 0){
-			angle = (curAngle+(Math.PI/dist/30)*(1+this.data.rotationSpeed*2));
+			angle = (curAngle+(Math.PI/dist/30)*(1+this.data.rotationSpeed*4));
 		}else{
 			angle = (curAngle+(Math.PI/dist/30)*(-1-this.data.rotationSpeed*2));
 		}
