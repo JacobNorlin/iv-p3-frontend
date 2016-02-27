@@ -19,6 +19,7 @@ export default class CountryVisualization{
 		this.specData = specData;
 		paper.setup(canvas);
 		this._getTypes(specData, type);
+		this.highlightedBalls = new Array();
 		// let background = new paper.Path.Rectangle(paper.view.center, new paper.Size(3000,3000));
 		// background.fillColor = "black";
 
@@ -27,6 +28,19 @@ export default class CountryVisualization{
 		this.balls = this._createBalls(specData);
 		console.log(this.balls);
 		paper.view.draw();
+	}
+
+	highlightBall(id){
+		let toHighlight = _.filter(this.balls, ball => {
+				return ball.path.data[this.type] === id;
+			})[0];
+		if(toHighlight.highlighted === true){
+			toHighlight.highlighted = false;
+		}else{
+			toHighlight.highlighted = true;
+		}
+		console.log(toHighlight);
+		toHighlight.highlight(toHighlight.highlighted);
 	}
 
 	update(newSpecData, genericData){
@@ -70,8 +84,8 @@ export default class CountryVisualization{
 		let trackRadiusDiff = maxRange/tracks+1;
 		let balls = new Array();
 		if(specData.length > 1){
-			for(let i = 0; i < tracks; i++){
-				for(let country of specData[i]){
+			for(let i = 1; i <= tracks; i++){
+				for(let country of specData[i-1]){
 					balls.push(this._createBall(i, trackRadiusDiff, country));
 				}
 			}	

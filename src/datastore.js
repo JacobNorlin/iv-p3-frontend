@@ -4,6 +4,7 @@ import $ from 'jquery';
 import {resturl} from './resturl.js';
 import Rx from 'rx';
 import _ from 'lodash';
+import CountryCodes from 'i18n-iso-countries';
 
 export default class DataFetcher{
 
@@ -15,6 +16,13 @@ export default class DataFetcher{
 			getPostData: "getCityDatas",
 			getDemographicDatas: "getDemographicDatas"
 		};
+		this.routeToType = {
+			getCountryDatas: "country",
+			getGenericDatas: "generic",
+			getCityDatas: "city",
+			getPostData: "post",
+			getDemographicDatas: "demographic"
+		};
 	}
 	
 	getDxData(route, date){
@@ -24,14 +32,14 @@ export default class DataFetcher{
 		return Rx.Observable.combineLatest(firstDate, secondDate)
 			.take(1)
 			.map(countryTuple => {
-				return _(countryTuple[0])
+				let datas =  _(countryTuple[0])
 				.zip(countryTuple[1])
 				.map(t => {
 					if(t[1]){
 						t[0].lifetime_likes_dx = t[0].lifetime_likes - t[1].lifetime_likes;
 						t[0].weekly_reach_dx = t[0].weekly_reach - t[1].weekly_reach;
 					}
-					
+					// t[0][this.routeToType[route]] = CountryCodes.getName(t[0][this.routeToType[route]], "en");
 					return t[0];
 				})
 				.groupBy(t => {
@@ -43,6 +51,10 @@ export default class DataFetcher{
 				})
 				.reverse()
 				.value();
+				return {
+					data: datas,
+					type: this.routeToType[route]
+				};
 			});
 	}
 

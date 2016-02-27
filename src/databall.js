@@ -1,6 +1,7 @@
 "use strict";
 import paper from 'paper';
 import {calculateRadius} from './drawutils.js';
+import $ from 'jquery';
 
 export default class DataBall{
 	
@@ -19,22 +20,40 @@ export default class DataBall{
 		this.path.fireLike = this.fireLike;
 		let f = 7/data.lifetime_likes_dx;
 		this.path.data.fireFreq = f < 0 ? Math.Infinity : f;
-		this.path.data.rotationSpeed = data.weekly_reach_dx*Math.PI/180;
+		this.path.data.rotationSpeed = Math.abs(data.weekly_reach_dx*Math.PI/180);
+		this.path.data.rotationDirection = data.weekly_reach_dx < 0 ? -1 : 1;
 		this.path.trailTimer = 0;
-		let strokeColor = this.path.data.rotationSpeed >= 0 ? "#82CAFF" : "#FFB682";
+		let strokeColor = this.path.data.rotationDirection >= 0 ? "#82CAFF" : "#FFB682";
 		this.path.trail = new paper.Path({
 			strokeColor: strokeColor,
 			strokeWidth: 1,
 			strokeCap: "round"
 		});
+		this.path.trail.storedColor = strokeColor;
 		this.path.toCenterLine = new paper.Path({
 			strokeColor: strokeColor,
 			strokeWidth: 1,
 			strokeCap: "round"
 		});
+		this.path.toCenterLine.storedColor = strokeColor;
 		this.path.toCenterLine.add(this.path.position);
 		this.path.toCenterLine.add(paper.view.center);
 		// console.log(this.path.data.rotationSpeed);
+	}
+
+	highlight(val){
+		if(val === true){
+			this.path.trail.strokeColor = "#CBFF82";
+			this.path.trail.strokeWidth = 5;
+			this.path.toCenterLine.strokeColor = "#CBFF82";
+			this.path.toCenterLine.strokeWidth = 5;
+		}else{
+			this.path.trail.strokeColor = this.path.trail.storedColor;
+			this.path.trail.strokeWidth = 1;
+			this.path.toCenterLine.strokeColor = this.path.toCenterLine.storedColor;
+			this.path.toCenterLine.strokeWidth = 1;
+		}
+		
 	}
 
 	setVisibility(val){
@@ -85,10 +104,10 @@ export default class DataBall{
 		let curAngle = centerDistV.angleInRadians;
 		let dist = centerDistV.length;
 		let angle = 0;
-		if(this.data.rotationSpeed >= 0){
-			angle = (curAngle+(Math.PI/dist/30)*(1+this.data.rotationSpeed*4));
+		if(this.data.rotationDirection >= 0){
+			angle = (curAngle+(Math.PI/dist/30)*(this.data.rotationSpeed*4));
 		}else{
-			angle = (curAngle+(Math.PI/dist/30)*(-1-this.data.rotationSpeed*2));
+			angle = (curAngle-(Math.PI/dist/30)*(this.data.rotationSpeed*4));
 		}
 
 		let x = Math.cos(angle)*dist;

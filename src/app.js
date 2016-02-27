@@ -1,11 +1,13 @@
 "use strict";
-import $ from 'jquery';
 import Parser from './parser.js';
 import paper from 'paper';
 import CountryVisualization from './countryvisualization.js';
 import DataFetcher from './datastore.js';
 import Rx from 'rx';
 import _ from 'lodash';
+import CountryCodes from 'i18n-iso-countries';
+require('datatables.net');
+
 // var file = new XMLHttpRequest();
 // file.open("GET", "file://../data/Facebook Insights Data Export - Visualization Studio VIC - 2014-01-01 - 2014-02-27.csv");
 // console.log(file);	
@@ -15,6 +17,7 @@ import _ from 'lodash';
 
 
 window.onload = function(){
+
 	document.getElementById('countries').onclick = loadCountryDatas;
 	document.getElementById('cities').onclick = loadCityDatas;
 	document.getElementById('demographics').onclick = loadDemographicDatas;
@@ -22,9 +25,21 @@ window.onload = function(){
 	var likeFilter = document.getElementById('likeFilter');
 	var reachNumber = document.getElementById('reachNumber');
 	var likeNumber = document.getElementById('likeNumber');
+	var table = $('#structureTable').dataTable( {
+		pageLength: 150,
+		columns:[
+			{title: "Structure"},
+			{title: "Lifetime Likes"},
+			{title: "Lifetime Likes dx"},
+			{title: "Weekly reach"},
+			{title: "Weekly reach dx"},
+		]
+	});
 
 	let timeline = document.getElementById('timelineFilter');
 	var timeNumber = document.getElementById('currentTime');
+
+	
 
 	
 	const firstDate = new Date("2014-01-08").getTime();
@@ -105,6 +120,18 @@ window.onload = function(){
 	var av = null;
 
 
+	$('#structureTable tbody').on('click', 'tr', function () {
+        let row = $(this)[0];
+        let structure = row.innerText.split('\t')[0];
+ 		av.highlightBall(structure);
+ 		if ( $(this).hasClass('selected') ) {
+            $(this).removeClass('selected');
+        }
+        else {
+            $(this).addClass('selected');
+        }
+    } );
+
 	$(document).keypress((e) => {
 		if(e.keyCode === 122){
 			av.changeZoom(0.3);
@@ -112,7 +139,10 @@ window.onload = function(){
 			av.changeZoom(-0.3);
 		}
 	})
-	function foo(data, type) {
+	function foo(datas) {
+		let data = datas.data;
+		let type = datas.type;
+		console.log(data);
 		currentSelectedDate = new Date(data[0][0].date).toDateString();
 		if(av){
 			av.remove();
@@ -138,6 +168,17 @@ window.onload = function(){
 	let cv = document.getElementById('myCanvas');
 	av = new CountryVisualization(cv, type, data);
 
+	//Set up datatable
+	let ballData = _(av.balls).map(ball => {
+		return ball.path.data;
+	})
+	.map(row => {
+		return [row[type], row.lifetime_likes, row.lifetime_likes_dx, row.weekly_reach, row.weekly_reach_dx];
+	}).value();
+	
+	//table stuff
+	table.fnClearTable();
+	table.fnAddData(ballData);
 
 
 	var onFrame = function onFrame(event){

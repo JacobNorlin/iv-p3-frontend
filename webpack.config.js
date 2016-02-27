@@ -18,13 +18,15 @@
               ],
 
               // Only run `.js` and `.jsx` files through Babel
-              test: /\.jsx?$/,
+              test: /\.js/,
 
               // Options to configure babel with
               query: {
                 presets: ['es2015']
-              }
+              },
+
             },
+
           ],
           },
         resolve: {
@@ -32,6 +34,13 @@
         },
         plugins: [
           new webpack.ResolverPlugin(
-                new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin(".bower.json", ["main"]))
+                new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin(".bower.json", ["main"])
+              ),
+          new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+            "window.jQuery": "jquery",
+            "window.$": "jquery"
+          })
         ],
     };
