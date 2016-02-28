@@ -75,14 +75,20 @@ export default class DataBall{
 		like.strokeColor = "blue";
 		like.opacity = 0.4;
 		like.timer = 0;
+		like.dTimer = 0;
 		paper.view.draw();
 		let onFrame = function(event){
-			this.scale(1.05);
-			this.opacity -= 0.005;
+			
 			this.timer += event.delta;
-			if(this.opacity <= 0.02){
-				this.remove();
-				this.timer = 0;
+			this.dTimer += event.delta;
+			if(this.dTimer >0.05){
+				this.dTimer = 0;
+				this.scale(1.2);
+				this.opacity -= 0.02;
+				if(this.opacity <= 0.02){
+					this.remove();
+					this.timer = 0;
+				}
 			}
 		};
 		like.onFrame = onFrame;
@@ -96,13 +102,13 @@ export default class DataBall{
 		}
 		this.toCenterLine.segments[0].point = this.position;
 		this.trailTimer += event.delta;
-		if(this.trailTimer > 0.1){
+		if(this.trailTimer > 0.15){
 			this.trailTimer = 0;	
 			var p = this.position;
 
-			// this.trail.smooth();
+			this.trail.smooth();
 
-			if(this.trail.segments.length > 100){
+			if(this.trail.segments.length > 75){
 				this.trail.removeSegment(0);	
 			}
 			this.trail.add(p);
@@ -113,9 +119,9 @@ export default class DataBall{
 		let dist = centerDistV.length;
 		let angle = 0;
 		if(this.data.rotationDirection >= 0){
-			angle = (curAngle+(Math.PI/300)*(this.data.rotationSpeed*4));
+			angle = (curAngle+(Math.PI/1000)*(this.data.rotationSpeed*4));
 		}else{
-			angle = (curAngle-(Math.PI/300)*(this.data.rotationSpeed*4));
+			angle = (curAngle-(Math.PI/1000)*(this.data.rotationSpeed*4));
 		}
 
 		let x = Math.cos(angle)*dist;

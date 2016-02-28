@@ -181,20 +181,20 @@ window.onload = function(){
 
 
 	function foo(datas) {
-		let data = datas.data;
+		let fbData = datas.data;
 		let type = datas.type;
-		console.log(data);
-		currentSelectedDate = new Date(data[0][0].date).toDateString();
+		console.log(datas);
+		currentSelectedDate = new Date(fbData[0][0].date).toDateString();
 		if(av){
 			av.remove();
 		}
-		let maxLikes = _(data).map(row => {
+		let maxLikes = _(fbData).map(row => {
 			return row.lifetime_likes;
 		})
 		.sortBy(x => {return x;})
 		.reverse()
 		.value()[0];
-		let maxReach = _(data).map(row => {
+		let maxReach = _(fbData).map(row => {
 			return row.weekly_reach;
 		})
 		.sortBy(x => {return x;})
@@ -205,7 +205,7 @@ window.onload = function(){
 		timeNumber.innerHTML = currentSelectedDate;
 
 		let cv = document.getElementById('myCanvas');
-		av = new CountryVisualization(cv, type, data);
+		av = new CountryVisualization(cv, type, fbData);
 
 		//Set up datatable
 		let ballData = _(av.balls).map(ball => {
