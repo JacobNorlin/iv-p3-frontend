@@ -30,9 +30,6 @@ export default class ParCoords{
         .render()
         .brushMode("1D-axes") 
 
-
-
-
         return pc1;
     }
 }

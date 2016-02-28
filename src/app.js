@@ -23,11 +23,11 @@ window.onload = function(){
 	var table = $('#structureTable').dataTable( {
 		pageLength: 150,
 		columns:[
-			{title: "Structure"},
-			{title: "Lifetime Likes"},
-			{title: "Lifetime Likes dx"},
-			{title: "Weekly reach"},
-			{title: "Weekly reach dx"},
+			{data: "Structure", title: "Structure"},
+			{data: "Lifetime Likes", title: "Lifetime Like"},
+			{data: "Lifetime Likes Dx", title: "Lifetime Like Dx"},
+			{data: "Weekly Reach", title: "Weekly Reach"},
+			{data: "Weekly Reach Dx", title: "Weekly Reach Dx"},
 		]
 	});
 
@@ -113,6 +113,9 @@ window.onload = function(){
 		likeFilter.max = maxLikes;
 	}
 
+	function createDataRow(structure, likes, likesdx, reach, reachdx){
+		return {Structure: structure, "Lifetime Likes": likes, "Lifetime Likes Dx": likesdx, "Weekly Reach": reach, "Weekly Reach Dx": reachdx};
+	}
 
 
 
@@ -122,14 +125,22 @@ window.onload = function(){
 	$('#structureTable tbody').on('click', 'tr', function () {
         let row = $(this)[0];
         let structure = row.innerText.split('\t')[0];
+        let d = row.innerText.split('\t');
+        let r = createDataRow(d[0], parseInt(d[1]), parseInt(d[2]), parseInt(d[3]), parseInt(d[4]));
  		av.highlightBall(structure);
+ 		console.log(r);
  		if ( $(this).hasClass('selected') ) {
+        	chart.chart.unhighlight()	;
             $(this).removeClass('selected');
         }
         else {
+ 			chart.chart.highlight([r]);
             $(this).addClass('selected');
         }
+
+
     } );
+
 
 	$(document).keypress((e) => {
 		if(e.keyCode === 122){
@@ -177,8 +188,8 @@ window.onload = function(){
 	chart = new ParCoords(ballData);
 	
 	//table stuff
-	// table.fnClearTable();
-	// table.fnAddData(ballData);
+	table.fnClearTable();
+	table.fnAddData(ballData);
 
 
 }
