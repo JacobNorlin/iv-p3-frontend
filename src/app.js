@@ -7,13 +7,8 @@ import Rx from 'rx';
 import _ from 'lodash';
 import CountryCodes from 'i18n-iso-countries';
 require('datatables.net');
+import {drawChart} from './charts.js';
 
-// var file = new XMLHttpRequest();
-// file.open("GET", "file://../data/Facebook Insights Data Export - Visualization Studio VIC - 2014-01-01 - 2014-02-27.csv");
-// console.log(file);	
-// file.onreadystatechange(() => {
-// 	console.log(file.responseText);
-// })
 
 
 window.onload = function(){
@@ -35,6 +30,11 @@ window.onload = function(){
 			{title: "Weekly reach dx"},
 		]
 	});
+
+
+
+
+
 
 	let timeline = document.getElementById('timelineFilter');
 	var timeNumber = document.getElementById('currentTime');
@@ -175,6 +175,8 @@ window.onload = function(){
 	.map(row => {
 		return [row[type], row.lifetime_likes, row.lifetime_likes_dx, row.weekly_reach, row.weekly_reach_dx];
 	}).value();
+
+	drawChart(ballData)
 	
 	//table stuff
 	table.fnClearTable();
