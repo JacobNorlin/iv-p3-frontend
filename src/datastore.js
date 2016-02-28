@@ -13,7 +13,7 @@ export default class DataFetcher{
 			getCountryDatas: "getCountryDatas",
 			getGenericDatas: "getGenericDatas",
 			getCityDatas: "getCityDatas",
-			getPostData: "getCityDatas",
+			getPostData: "getPostData",
 			getDemographicDatas: "getDemographicDatas"
 		};
 		this.routeToType = {
@@ -72,11 +72,11 @@ export default class DataFetcher{
 	}
 
 	getGenericDatas(date){
-		return this.getDxData(this.routes.getGenericDatas, date);
+		return this.getData(this.routes.getGenericDatas, date);
 	}
 
 	getPostData(date){
-		return this.getDxData(this.routes.getPostData, date);
+		return this.getData(this.routes.getPostData, date);
 	}
 
 	getCityDatas(date){

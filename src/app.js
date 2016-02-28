@@ -8,6 +8,9 @@ import _ from 'lodash';
 import CountryCodes from 'i18n-iso-countries';
 require('datatables.net');
 import ParCoords from './charts.js';
+require('bootstrap');
+import d3 from 'd3';
+
 
 
 //this really needs to be cleaned up and refactored
@@ -16,6 +19,12 @@ window.onload = function(){
 	document.getElementById('countries').onclick = loadCountryDatas;
 	document.getElementById('cities').onclick = loadCityDatas;
 	document.getElementById('demographics').onclick = loadDemographicDatas;
+	document.getElementById('posts').onclick = loadPostDatas;
+	document.getElementById('generics').onclick = loadGenericDatas;
+
+
+	var genericDataDiv = document.getElementById('genericDataDiv')
+
 	var reachFilter = document.getElementById('reachFilter');
 	var likeFilter = document.getElementById('likeFilter');
 	var reachNumber = document.getElementById('reachNumber');
@@ -47,6 +56,7 @@ window.onload = function(){
 	const dayRange = Math.round((lastDate - firstDate)/oneDay);
 	timeline.max = dayRange;
 
+
 	function getDate(day){
 		let ms = firstDate+day*oneDay;
 		let date = new Date(ms);
@@ -63,8 +73,43 @@ window.onload = function(){
 	};
 
 
-	// ds.getPostData("2015-03-01").then((d) => {console.log(d)});
-	// ds.getGenericDatas("2015-03-05").then((d) => {console.log(d)});
+	var blue_to_brown = d3.scale.linear()
+	.domain([9, 40])
+	.range(["steelblue", "brown"])
+	.interpolate(d3.interpolateLab);
+
+	function loadGenericDatas(){
+		ds.getGenericDatas()
+			.subscribe(data => {
+				let color = (d) => {return blue_to_brown(d.daily_engaged_users);};
+				let useless = ["generic_key"];
+				let plotData = _.map(data, row => {
+					row.date = new Date(row.date).toDateString();
+					return _.omit(row, useless);
+				});
+				console.log(data);
+				new ParCoords(plotData, "genericDataDiv", color);
+			});
+	}
+
+	function loadPostDatas(){
+		ds.getPostData()
+			.subscribe(data => {
+				let color =  {
+					"Photo": "#1f77b4",
+					"Video": "#ff7f0e",
+					"Link": "#2ca02c",
+					"Status": "#d62728"
+				}
+				let useless = ["permalink", "post_id", "post_key", "post_message", "posted"];
+				let plotData = _.map(data, row => {
+					row.posted = new Date(row.posted).toDateString();
+					return _.omit(row, useless);
+				});
+				console.log(plotData);
+				new ParCoords(plotData, "genericDataDiv", (d) => {return color[d.type]});
+			});
+	}
 
 	function loadCountryDatas(){
 		currentRoute = ds.routes.getCountryDatas;
@@ -185,7 +230,8 @@ window.onload = function(){
 	}).value();
 	
 
-	chart = new ParCoords(ballData);
+
+	chart = new ParCoords(ballData, "test", (d) => {return blue_to_brown(d["Weekly Reach"])});
 	
 	//table stuff
 	table.fnClearTable();
