@@ -65,17 +65,31 @@ export default class CountryVisualization{
 		return true;
 	}
 
-	filter(prop, value){
-		this.currentFilters[prop] = value;
-		for(let ball of this.balls){
+	filter(structures){
 
-			if(!this._checkFilter(ball)){
-				ball.setVisibility(false);
-			}else{
-				ball.setVisibility(true);
+		for(let ball of this.balls){
+			for(let structure of structures){
+				if(ball.path.data[this.type] === structure){
+					ball.setVisibility(true);
+					break;
+				}else{
+					ball.setVisibility(false);
+				}
 			}
 		}
 	}
+
+	// filter(prop, value){
+	// 	this.currentFilters[prop] = value;
+	// 	for(let ball of this.balls){
+
+	// 		if(!this._checkFilter(ball)){
+	// 			ball.setVisibility(false);
+	// 		}else{
+	// 			ball.setVisibility(true);
+	// 		}
+	// 	}
+	// }
 
 	_createBalls(specData){
 		// console.log(specData);

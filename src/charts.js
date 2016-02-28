@@ -8,6 +8,7 @@ export default class ParCoords{
 
     constructor(data, divId, colorBy){
         this.chart = this._drawChart(data, divId, colorBy);
+        this.currentSelection = [];
     }
 
 
@@ -23,7 +24,7 @@ export default class ParCoords{
         .detectDimensions()
         .color(color)  
 
-        .alpha(0.35)
+        .alpha(1)
         .render()
         .brushMode("1D-axes") 
 

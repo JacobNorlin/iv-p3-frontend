@@ -16,7 +16,7 @@
  <script src="./build/bundle.js"></script>
 
  <div class="container-fluid">
-<div class="row">
+<div class="row" style="height:80%">
     <div id="specificData" class="modal fade" role="dialog">
         <div class="modal-dialog" style="width:100%">
 
@@ -38,7 +38,7 @@
   </div>
 
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-6" >
         <div id="canvasDiv">
         <canvas id="myCanvas"> </canvas>
             <div id="filters">
@@ -50,17 +50,13 @@
                     <button id='generics' type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#specificData">Generic</button>
 
                 </div>
-                <div id="reachNumber"></div>
-                <input type="range" id="reachFilter" >Filter reach
-                <div id="likeNumber"></div>
-                <input type="range" id="likeFilter">Filter likes
                 <div id="currentTime"></div><div id="hoverDate"></div>
                 <input type="range" id="timelineFilter"></input>
         </div> 
     </div>
     </div>
-    <div class="col-sm-6" style="width=100%">
-        <div id="test" class="parcoords" style="height:100%"></div>
+    <div class="col-sm-6 col-sm" style="width=100%">
+        <div id="test" class="parcoords" style="height:80%"></div>
         <div id="dataTableDiv">
             <h1>Data</h1>
             <table class="table table-bordered" id="structureTable"></table>

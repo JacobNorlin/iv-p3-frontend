@@ -5,6 +5,14 @@ import $ from 'jquery';
 
 export default class DataBall{
 	
+	/**
+	Rotation speed scales with increase in reach
+	Color is dependent on increase/decrease in reach
+	Size of dot scales with lifetime likes
+	Firelike rate scales with increase in likes
+	Distance from center scales with weekly reach
+
+	*/
 	constructor(data, pos){
 		this.radius = calculateRadius(data.lifetime_likes);
 		this.path = new paper.Path.Circle(pos, this.radius);
@@ -105,9 +113,9 @@ export default class DataBall{
 		let dist = centerDistV.length;
 		let angle = 0;
 		if(this.data.rotationDirection >= 0){
-			angle = (curAngle+(Math.PI/dist/30)*(this.data.rotationSpeed*4));
+			angle = (curAngle+(Math.PI/300)*(this.data.rotationSpeed*4));
 		}else{
-			angle = (curAngle-(Math.PI/dist/30)*(this.data.rotationSpeed*4));
+			angle = (curAngle-(Math.PI/300)*(this.data.rotationSpeed*4));
 		}
 
 		let x = Math.cos(angle)*dist;

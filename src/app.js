@@ -25,11 +25,7 @@ window.onload = function(){
 
 	var genericDataDiv = document.getElementById('genericDataDiv')
 
-	var reachFilter = document.getElementById('reachFilter');
-	var likeFilter = document.getElementById('likeFilter');
-	var reachNumber = document.getElementById('reachNumber');
-	var likeNumber = document.getElementById('likeNumber');
-	var table = $('#structureTable').dataTable( {
+	var table = $('#structureTable').DataTable( {
 		pageLength: 150,
 		columns:[
 			{data: "Structure", title: "Structure"},
@@ -74,8 +70,8 @@ window.onload = function(){
 
 
 	var blue_to_brown = d3.scale.linear()
-	.domain([9, 40])
-	.range(["steelblue", "brown"])
+	.domain([9, 50])
+	.range(["brown", "steelblue"])
 	.interpolate(d3.interpolateLab);
 
 	function loadGenericDatas(){
@@ -135,29 +131,6 @@ window.onload = function(){
 		.subscribe(foo);
 
 
-	var reachChange = Rx.Observable.fromEvent(reachFilter, 'input')
-		.map(event => {
-			return event.srcElement.value;
-		});
-	reachChange.subscribe(x => {
-		reachNumber.innerHTML = x;
-		av.filter('weekly_reach', x);
-		
-	});
-
-	var likeChange = Rx.Observable.fromEvent(likeFilter, 'input')
-			.map(event => {
-				return event.srcElement.value;
-			});
-		likeChange.subscribe(x => {
-			likeNumber.innerHTML = x;
-			av.filter('lifetime_likes', x);
-		});
-	function setUpFilters(maxLikes, maxReach){
-		reachFilter.max = maxReach;
-		likeFilter.max = maxLikes;
-	}
-
 	function createDataRow(structure, likes, likesdx, reach, reachdx){
 		return {Structure: structure, "Lifetime Likes": likes, "Lifetime Likes Dx": likesdx, "Weekly Reach": reach, "Weekly Reach Dx": reachdx};
 	}
@@ -194,6 +167,19 @@ window.onload = function(){
 			av.changeZoom(-0.3);
 		}
 	})
+
+	//extend filtering for table
+	$.fn.dataTableExt.afnFiltering.push(
+		function(settings, data, i){
+			// console.log(chart.currentSelection);
+			if(chart.currentSelection.length > 0){
+				return $.inArray(data[0], chart.currentSelection) > -1;
+			}
+			return true;
+
+		})
+
+
 	function foo(datas) {
 		let data = datas.data;
 		let type = datas.type;
@@ -214,28 +200,36 @@ window.onload = function(){
 		.sortBy(x => {return x;})
 		.reverse()
 		.value()[0];
-		setUpFilters(maxLikes, maxReach);
+
 
 		timeNumber.innerHTML = currentSelectedDate;
 
-	let cv = document.getElementById('myCanvas');
-	av = new CountryVisualization(cv, type, data);
+		let cv = document.getElementById('myCanvas');
+		av = new CountryVisualization(cv, type, data);
 
-	//Set up datatable
-	let ballData = _(av.balls).map(ball => {
-		return ball.path.data;
-	})
-	.map(row => {
-		return {Structure: row[type], "Lifetime Likes": row.lifetime_likes, "Lifetime Likes Dx": row.lifetime_likes_dx, "Weekly Reach": row.weekly_reach, "Weekly Reach Dx": row.weekly_reach_dx};
-	}).value();
-	
+		//Set up datatable
+		let ballData = _(av.balls).map(ball => {
+			return ball.path.data;
+		})
+		.map(row => {
+			return {Structure: row[type], "Lifetime Likes": row.lifetime_likes, "Lifetime Likes Dx": row.lifetime_likes_dx, "Weekly Reach": row.weekly_reach, "Weekly Reach Dx": row.weekly_reach_dx};
+		}).value();
+		
 
+		chart = new ParCoords(ballData, "test", (d) => {
+			return d["Weekly Reach Dx"] >= 0 ? "#82CAFF" : "#FFB682";
+		});
+		chart.chart.on("brush", selection => {
+			let structures = _.map(selection, s => {return s.Structure;});
+			av.filter(structures);
+			chart.currentSelection = structures;
+			table.draw();
+		});
+		
+		//table stuff
+		table.clear();
+		table.rows.add(ballData).draw();
 
-	chart = new ParCoords(ballData, "test", (d) => {return blue_to_brown(d["Weekly Reach"])});
-	
-	//table stuff
-	table.fnClearTable();
-	table.fnAddData(ballData);
 
 
 }
