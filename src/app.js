@@ -7,10 +7,10 @@ import Rx from 'rx';
 import _ from 'lodash';
 import CountryCodes from 'i18n-iso-countries';
 require('datatables.net');
-import {drawChart} from './charts.js';
+import ParCoords from './charts.js';
 
 
-
+//this really needs to be cleaned up and refactored
 window.onload = function(){
 
 	document.getElementById('countries').onclick = loadCountryDatas;
@@ -31,8 +31,7 @@ window.onload = function(){
 		]
 	});
 
-
-
+	var chart = null;
 
 
 
@@ -162,9 +161,7 @@ window.onload = function(){
 		setUpFilters(maxLikes, maxReach);
 
 		timeNumber.innerHTML = currentSelectedDate;
-	// let countryData = _.mapKeys(data, (value, key) => {
-	// 	return value.country;
-	// });
+
 	let cv = document.getElementById('myCanvas');
 	av = new CountryVisualization(cv, type, data);
 
@@ -173,26 +170,17 @@ window.onload = function(){
 		return ball.path.data;
 	})
 	.map(row => {
-		return [row[type], row.lifetime_likes, row.lifetime_likes_dx, row.weekly_reach, row.weekly_reach_dx];
+		return {Structure: row[type], "Lifetime Likes": row.lifetime_likes, "Lifetime Likes Dx": row.lifetime_likes_dx, "Weekly Reach": row.weekly_reach, "Weekly Reach Dx": row.weekly_reach_dx};
 	}).value();
+	
 
-	drawChart(ballData)
+	chart = new ParCoords(ballData);
 	
 	//table stuff
-	table.fnClearTable();
-	table.fnAddData(ballData);
+	// table.fnClearTable();
+	// table.fnAddData(ballData);
 
 
-	var onFrame = function onFrame(event){
-		timer += event.delta;
-		if(timer > 2){
-			timer = 0;
-			_.forEach(av.balls, ball => {
-				ball.fireLike();
-			})
-		}
-	};
-	// paper.view.onFrame = onFrame;
 }
 
 
