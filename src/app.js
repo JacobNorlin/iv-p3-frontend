@@ -37,7 +37,10 @@ window.onload = function(){
 	});
 
 
-	var chart = null;
+	var chart = new ParCoords([], "test", "red");
+	var genericChart = new ParCoords([], "genericDataDiv", "red");
+
+	var genericTable = null;
 
 	var currentSelection = [];
 
@@ -76,31 +79,43 @@ window.onload = function(){
 	.interpolate(d3.interpolateLab);
 
 	function setUpTable(tableId, data){
-		let genericTable = $("#"+tableId);
+		let t = $("#"+tableId);
+		t.empty();
 
 		let columns = _(data[0])
 			.map((key, value) => {
 				return {data: value, title: value};
 			}).value();
-		genericTable = genericTable.DataTable({
-			pageLength: 30,
+		t = t.DataTable({
+			pageLength: 10,
 			columns: columns,
-			destroy: true
+			destroy: true,
+			scrollable: true
 		});
-		console.log(data);
-		genericTable.rows.add(data);
-		genericTable.draw();
-		return genericTable;
+		t.clear();
+		t.rows.add(data);
+		t.draw();
+
+		$('#genericDataTable tbody').on('mouseover', 'tr', function () {
+					let row = t.row(this).data();
+					genericChart.chart.highlight([row]);
+				} );
+				$('#genericDataTable tbody').on('mouseout', 'tr', function () {
+					let row = t.row(this).data();
+					genericChart.chart.unhighlight();
+				} );
+		return t;
 	}
 
-	function setUpChart(data, divId, color, genericTable){
-		let c = new ParCoords(data, divId, color);
+	function setUpChart(data, divId, color, t, useless){
+		let c = new ParCoords(data, divId, color, useless);
 		c.chart.on("brush", selection => {
-			let structures = _.map(selection, s => {return _.values(s)});
-			currentSelection = structures;
-			console.log(currentSelection);
-			genericTable.draw();
+			let structures = _.map(selection, s => {return _.values(s)[0];});
+			c.currentSelection = structures;
+			t.draw();
+			
 		});
+		return c;	
 	}
 
 	function loadGenericDatas(){
@@ -108,12 +123,9 @@ window.onload = function(){
 			.subscribe(data => {
 				let color = (d) => {return blue_to_brown(d.daily_engaged_users);};
 				let useless = ["generic_key", "date"];
-				let plotData = _.map(data, row => {
-					row.date = new Date(row.date).toDateString();
-					return _.omit(row, useless);
-				});
-				let a = setUpTable("genericDataTable", data);
-				setUpChart(plotData, "genericDataDiv", color, a);
+				genericTable = setUpTable("genericDataTable", data);
+				genericChart = setUpChart(data, "genericDataDiv", color, genericTable, useless);
+				genericTable.draw();
 				
 			});
 	}
@@ -126,15 +138,12 @@ window.onload = function(){
 					"Video": "#ff7f0e",
 					"Link": "#2ca02c",
 					"Status": "#d62728"
-				}
-				let useless = ["permalink", "post_id", "post_key", "post_message", "posted"];
-				let plotData = _.map(data, row => {
-					row.posted = new Date(row.posted).toDateString();
-					return _.omit(row, useless);
-				});
-				let a = setUpTable("genericDataTable", data);
-				setUpChart(plotData, "genericDataDiv", (d) => {return color[d.type];}, a);
-
+				};
+				let useless = ["post_message", "posted", "post_id"];
+				let plotData = _(data).map(row => {return _.omit(row, ["permalink", "post_key"]);}).value();
+				genericTable = setUpTable("genericDataTable", plotData);
+				genericChart = setUpChart(plotData, "genericDataDiv", (d) => {return color[d.type];}, genericTable, useless);
+				genericTable.draw();
 			});
 	}
 
@@ -172,18 +181,14 @@ window.onload = function(){
 
 
 	$('#structureTable tbody').on('click', 'tr', function () {
-        let row = $(this)[0];
-        let structure = row.innerText.split('\t')[0];
-        let d = row.innerText.split('\t');
-        let r = createDataRow(d[0], parseInt(d[1]), parseInt(d[2]), parseInt(d[3]), parseInt(d[4]));
- 		av.highlightBall(structure);
- 		console.log(r);
+        let row = table.row(this).data()
+ 		av.highlightBall(row.Structure);
  		if ( $(this).hasClass('selected') ) {
         	chart.chart.unhighlight()	;
             $(this).removeClass('selected');
         }
         else {
- 			chart.chart.highlight([r]);
+ 			chart.chart.highlight([row]);
             $(this).addClass('selected');
         }
 
@@ -202,10 +207,14 @@ window.onload = function(){
 	//extend filtering for table
 	$.fn.dataTableExt.afnFiltering.push(
 		function(settings, data, i){
-			// console.log(chart.currentSelection);
-			if(currentSelection.length > 0){
-				return $.inArray(data[0], currentSelection) > -1;
+			if(chart.currentSelection.length > 0 || genericChart.currentSelection.length > 0){
+				let a = $.inArray(data[0], chart.currentSelection) > -1;
+				let b = $.inArray(data[0], genericChart.currentSelection) > -1;
+
+				return a || b
+
 			}
+			
 			return true;
 
 		})	
@@ -214,6 +223,7 @@ window.onload = function(){
 	function foo(datas) {
 		let fbData = datas.data;
 		let type = datas.type;
+		genericChart = new ParCoords([], "genericDataDiv", "red");
 		console.log(datas);
 		currentSelectedDate = new Date(fbData[0][0].date).toDateString();
 		if(av){
@@ -258,7 +268,7 @@ window.onload = function(){
 		chart.chart.on("brush", selection => {
 			let structures = _.map(selection, s => {return s.Structure;});
 			av.filter(structures);
-			currentSelection = structures;
+			chart.currentSelection = structures;
 			table.draw();
 		});
 		
