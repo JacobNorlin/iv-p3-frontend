@@ -25,7 +25,7 @@ export default class CountryVisualization{
 		// let background = new paper.Path.Rectangle(paper.view.center, new paper.Size(3000,3000));
 		// background.fillColor = "black";
 
-		paper.view.zoom = 0.5;
+		paper.view.zoom = 0.7;
 		this.visStudio = new VisualisationStudio(genericData);
 		this.balls = this._createBalls(specData);
 		console.log(this.balls);

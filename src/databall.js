@@ -102,13 +102,14 @@ export default class DataBall{
 		}
 		this.toCenterLine.segments[0].point = this.position;
 		this.trailTimer += event.delta;
-		if(this.trailTimer > 0.15){
+		let trailLimit = 0.3;
+		if(this.trailTimer > trailLimit){
 			this.trailTimer = 0;	
 			var p = this.position;
 
 			this.trail.smooth();
 
-			if(this.trail.segments.length > 75){
+			if(this.trail.segments.length > trailLimit*250){
 				this.trail.removeSegment(0);	
 			}
 			this.trail.add(p);
