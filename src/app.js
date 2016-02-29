@@ -36,9 +36,10 @@ window.onload = function(){
 		]
 	});
 
+
 	var chart = null;
 
-
+	var currentSelection = [];
 
 	let timeline = document.getElementById('timelineFilter');
 	var timeNumber = document.getElementById('currentTime');
@@ -74,17 +75,46 @@ window.onload = function(){
 	.range(["brown", "steelblue"])
 	.interpolate(d3.interpolateLab);
 
+	function setUpTable(tableId, data){
+		let genericTable = $("#"+tableId);
+
+		let columns = _(data[0])
+			.map((key, value) => {
+				return {data: value, title: value};
+			}).value();
+		genericTable = genericTable.DataTable({
+			pageLength: 30,
+			columns: columns,
+			destroy: true
+		});
+		console.log(data);
+		genericTable.rows.add(data);
+		genericTable.draw();
+		return genericTable;
+	}
+
+	function setUpChart(data, divId, color, genericTable){
+		let c = new ParCoords(data, divId, color);
+		c.chart.on("brush", selection => {
+			let structures = _.map(selection, s => {return _.values(s)});
+			currentSelection = structures;
+			console.log(currentSelection);
+			genericTable.draw();
+		});
+	}
+
 	function loadGenericDatas(){
 		ds.getGenericDatas()
 			.subscribe(data => {
 				let color = (d) => {return blue_to_brown(d.daily_engaged_users);};
-				let useless = ["generic_key"];
+				let useless = ["generic_key", "date"];
 				let plotData = _.map(data, row => {
 					row.date = new Date(row.date).toDateString();
 					return _.omit(row, useless);
 				});
-				console.log(data);
-				new ParCoords(plotData, "genericDataDiv", color);
+				let a = setUpTable("genericDataTable", data);
+				setUpChart(plotData, "genericDataDiv", color, a);
+				
 			});
 	}
 
@@ -102,8 +132,9 @@ window.onload = function(){
 					row.posted = new Date(row.posted).toDateString();
 					return _.omit(row, useless);
 				});
-				console.log(plotData);
-				new ParCoords(plotData, "genericDataDiv", (d) => {return color[d.type]});
+				let a = setUpTable("genericDataTable", data);
+				setUpChart(plotData, "genericDataDiv", (d) => {return color[d.type];}, a);
+
 			});
 	}
 
@@ -172,12 +203,12 @@ window.onload = function(){
 	$.fn.dataTableExt.afnFiltering.push(
 		function(settings, data, i){
 			// console.log(chart.currentSelection);
-			if(chart.currentSelection.length > 0){
-				return $.inArray(data[0], chart.currentSelection) > -1;
+			if(currentSelection.length > 0){
+				return $.inArray(data[0], currentSelection) > -1;
 			}
 			return true;
 
-		})
+		})	
 
 
 	function foo(datas) {
@@ -215,20 +246,26 @@ window.onload = function(){
 			return {Structure: row[type], "Lifetime Likes": row.lifetime_likes, "Lifetime Likes Dx": row.lifetime_likes_dx, "Weekly Reach": row.weekly_reach, "Weekly Reach Dx": row.weekly_reach_dx};
 		}).value();
 		
+		if(av.type === "country"){
+			document.getElementById('test').style.height = "150%";
+		}else{
+			document.getElementById('test').style.height = "80%";
 
+		}
 		chart = new ParCoords(ballData, "test", (d) => {
 			return d["Weekly Reach Dx"] >= 0 ? "#82CAFF" : "#FFB682";
 		});
 		chart.chart.on("brush", selection => {
 			let structures = _.map(selection, s => {return s.Structure;});
 			av.filter(structures);
-			chart.currentSelection = structures;
+			currentSelection = structures;
 			table.draw();
 		});
 		
 		//table stuff
 		table.clear();
 		table.rows.add(ballData).draw();
+
 
 
 

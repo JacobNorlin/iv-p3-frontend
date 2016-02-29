@@ -5,6 +5,8 @@ import _ from 'lodash';
 import DataBall from './databall.js';
 import {randomPointOnCircle,pointOnCircle} from './drawutils.js';
 import VisualisationStudio from './visualisationstudio.js';
+import CountryCodes from 'i18n-iso-countries';
+
 
 export default class CountryVisualization{
 	
@@ -99,8 +101,11 @@ export default class CountryVisualization{
 		let balls = new Array();
 		if(specData.length > 1){
 			for(let i = 1; i <= tracks; i++){
-				for(let country of specData[i-1]){
-					balls.push(this._createBall(i, trackRadiusDiff, country));
+				for(let row of specData[i-1]){
+					if(this.type === "country"){
+						row[this.type] = CountryCodes.getName(row[this.type], "en");
+					}
+					balls.push(this._createBall(i, trackRadiusDiff, row));
 				}
 			}	
 		}else{
