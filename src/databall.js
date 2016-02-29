@@ -13,7 +13,7 @@ export default class DataBall{
 	Distance from center scales with weekly reach
 
 	*/
-	constructor(data, pos){
+	constructor(data, pos, type){
 		this.radius = calculateRadius(data.lifetime_likes);
 		this.path = new paper.Path.Circle(pos, this.radius);
 		this.path.data = data;
@@ -46,6 +46,11 @@ export default class DataBall{
 		this.path.toCenterLine.storedColor = strokeColor;
 		this.path.toCenterLine.add(this.path.position);
 		this.path.toCenterLine.add(paper.view.center);
+
+		let textName = new paper.PointText(pos);
+		textName.content = data[type];
+		textName.visible = false;
+		this.path.textName = textName;
 		// console.log(this.path.data.rotationSpeed);
 	}
 
@@ -55,11 +60,13 @@ export default class DataBall{
 			this.path.trail.strokeWidth = 5;
 			this.path.toCenterLine.strokeColor = "#CBFF82";
 			this.path.toCenterLine.strokeWidth = 5;
+			this.path.textName.visible = true;
 		}else{
 			this.path.trail.strokeColor = this.path.trail.storedColor;
 			this.path.trail.strokeWidth = 1;
 			this.path.toCenterLine.strokeColor = this.path.toCenterLine.storedColor;
 			this.path.toCenterLine.strokeWidth = 1;
+			this.path.textName.visible = false;
 		}
 		
 	}
@@ -130,6 +137,7 @@ export default class DataBall{
 		let offset = new paper.Point(x,y);
 		let pos = paper.view.center.add(offset);
 		this.position = pos;
+		this.textName.position = pos.add(new paper.Point(30, 0));
 
 	}
 	

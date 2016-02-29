@@ -28,12 +28,13 @@ window.onload = function(){
 	var table = $('#structureTable').DataTable( {
 		pageLength: 150,
 		columns:[
-			{data: "Structure", title: "Structure"},
-			{data: "Lifetime Likes", title: "Lifetime Like"},
-			{data: "Lifetime Likes Dx", title: "Lifetime Like Dx"},
-			{data: "Weekly Reach", title: "Weekly Reach"},
-			{data: "Weekly Reach Dx", title: "Weekly Reach Dx"},
-		]
+		{data: "Structure", title: "Structure"},
+		{data: "Lifetime Likes", title: "Lifetime Like"},
+		{data: "Lifetime Likes Dx", title: "Lifetime Like Dx"},
+		{data: "Weekly Reach", title: "Weekly Reach"},
+		{data: "Weekly Reach Dx", title: "Weekly Reach Dx"},
+		],
+		scrollY: "400px"
 	});
 
 
@@ -79,31 +80,37 @@ window.onload = function(){
 	.interpolate(d3.interpolateLab);
 
 	function setUpTable(tableId, data){
-		let t = $("#"+tableId);
-		t.empty();
+
+		//kill me
+		let t = $("#"+tableId+"_wrapper");
+		t.remove();
+		t = $("#genericDataTableDiv");
+		t.append("<table id='"+tableId+"' class='table table-bordered'></table>");
+		t = $("#"+tableId);
 
 		let columns = _(data[0])
-			.map((key, value) => {
-				return {data: value, title: value};
-			}).value();
+		.map((key, value) => {
+			return {data: value, title: value};
+		}).value();
 		t = t.DataTable({
 			pageLength: 10,
 			columns: columns,
 			destroy: true,
-			scrollable: true
+			scrollY: "400px",
+			scrollX: "100%"
 		});
 		t.clear();
 		t.rows.add(data);
 		t.draw();
 
 		$('#genericDataTable tbody').on('mouseover', 'tr', function () {
-					let row = t.row(this).data();
-					genericChart.chart.highlight([row]);
-				} );
-				$('#genericDataTable tbody').on('mouseout', 'tr', function () {
-					let row = t.row(this).data();
-					genericChart.chart.unhighlight();
-				} );
+			let row = t.row(this).data();
+			genericChart.chart.highlight([row]);
+		} );
+		$('#genericDataTable tbody').on('mouseout', 'tr', function () {
+			let row = t.row(this).data();
+			genericChart.chart.unhighlight();
+		} );
 		return t;
 	}
 
@@ -120,55 +127,65 @@ window.onload = function(){
 
 	function loadGenericDatas(){
 		ds.getGenericDatas()
-			.subscribe(data => {
-				let color = (d) => {return blue_to_brown(d.daily_engaged_users);};
-				let useless = ["generic_key", "date"];
-				genericTable = setUpTable("genericDataTable", data);
-				genericChart = setUpChart(data, "genericDataDiv", color, genericTable, useless);
-				genericTable.draw();
-				
-			});
+		.subscribe(data => {
+			let color = (d) => {return blue_to_brown(d.daily_engaged_users);};
+			let useless = ["generic_key", "date"];
+			genericTable = setUpTable("genericDataTable", data);
+			genericChart = setUpChart(data, "genericDataDiv", color, genericTable, useless);
+			genericTable.draw();
+
+		});
 	}
 
 	function loadPostDatas(){
 		ds.getPostData()
-			.subscribe(data => {
-				let color =  {
-					"Photo": "#1f77b4",
-					"Video": "#ff7f0e",
-					"Link": "#2ca02c",
-					"Status": "#d62728"
-				};
-				let useless = ["post_message", "posted", "post_id"];
-				let plotData = _(data).map(row => {return _.omit(row, ["permalink", "post_key"]);}).value();
-				genericTable = setUpTable("genericDataTable", plotData);
-				genericChart = setUpChart(plotData, "genericDataDiv", (d) => {return color[d.type];}, genericTable, useless);
-				genericTable.draw();
-			});
+		.subscribe(data => {
+			let color =  {
+				"Photo": "#1f77b4",
+				"Video": "#ff7f0e",
+				"Link": "#2ca02c",
+				"Status": "#d62728"
+			};
+			let useless = ["post_message", "posted", "post_id"];
+			let plotData = _(data).map(row => {return _.omit(row, ["permalink", "post_key"]);}).value();
+			genericTable = setUpTable("genericDataTable", plotData);
+			genericChart = setUpChart(plotData, "genericDataDiv", (d) => {return color[d.type];}, genericTable, useless);
+			genericTable.draw();
+		});
+	}
+
+	function updateButtonHighlight(buttonId){
+		$("#countries").removeClass("btn-success");
+		$("#demographics").removeClass("btn-success");
+		$("#cities").removeClass("btn-success");
+		$("#"+buttonId).addClass("btn-success");
 	}
 
 	function loadCountryDatas(){
 		currentRoute = ds.routes.getCountryDatas;
+		updateButtonHighlight("countries")
 		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo, "country");
 	}
 	function loadCityDatas(){
 		currentRoute = ds.routes.getCityDatas;
+		updateButtonHighlight("cities")
 		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo, "city");
 	}
 	function loadDemographicDatas(){
 		currentRoute = ds.routes.getDemographicDatas;
+		updateButtonHighlight("demographics")
 		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo, "demographic");
 	}
 
 	let timelineChange = Rx.Observable.fromEvent(timeline, 'change')
-		.map(event => {
-			return event.srcElement.value;
-		})
-		.map(getDate)
-		.flatMap(date => {
-			return ds.getDxData(currentRoute, date);
-		})
-		.subscribe(foo);
+	.map(event => {
+		return event.srcElement.value;
+	})
+	.map(getDate)
+	.flatMap(date => {
+		return ds.getDxData(currentRoute, date);
+	})
+	.subscribe(foo);
 
 
 	function createDataRow(structure, likes, likesdx, reach, reachdx){
@@ -178,22 +195,39 @@ window.onload = function(){
 
 
 	var av = null;
+	var selectedRows = [];
 
+	$('#structureTable tbody').on('mouseover', 'tr', function () {
+			let row = table.row(this).data();
+			chart.chart.highlight([row]);
+			av.highlightBall(row.Structure, true)
+		} );
+	$('#structureTable tbody').on('mouseout', 'tr', function () {
+		let row = table.row(this).data();
+		chart.chart.unhighlight();
+		av.highlightBall(row.Structure, false)
+	} );
 
 	$('#structureTable tbody').on('click', 'tr', function () {
-        let row = table.row(this).data()
- 		av.highlightBall(row.Structure);
- 		if ( $(this).hasClass('selected') ) {
-        	chart.chart.unhighlight()	;
-            $(this).removeClass('selected');
-        }
-        else {
- 			chart.chart.highlight([row]);
-            $(this).addClass('selected');
-        }
+		let row = table.row(this).data()
+		av.highlightBall(row.Structure);
+		if ( $(this).hasClass('selected') ) {
+			selectedRows = selectedRows.splice(selectedRows, selectedRows.indexOf(row));
+			if(selectedRows.length > 0){
+				chart.chart.highlight(selectedRows);
+			}else{
+				chart.chart.unhighlight();
+			}
+			$(this).removeClass('selected');
+		}
+		else {
+			selectedRows.push(row);
+			chart.chart.highlight(selectedRows);
+			$(this).addClass('selected');
+		}
 
 
-    } );
+	} );
 
 
 	$(document).keypress((e) => {
@@ -219,7 +253,7 @@ window.onload = function(){
 
 		})	
 
-
+	
 	function foo(datas) {
 		let fbData = datas.data;
 		let type = datas.type;
@@ -256,15 +290,15 @@ window.onload = function(){
 			return {Structure: row[type], "Lifetime Likes": row.lifetime_likes, "Lifetime Likes Dx": row.lifetime_likes_dx, "Weekly Reach": row.weekly_reach, "Weekly Reach Dx": row.weekly_reach_dx};
 		}).value();
 		
-		if(av.type === "country"){
-			document.getElementById('test').style.height = "150%";
-		}else{
-			document.getElementById('test').style.height = "80%";
+		// if(av.type === "country"){
+		// 	document.getElementById('test').style.height = "100%";
+		// }else{
+		// 	document.getElementById('test').style.height = "80%";
 
-		}
+		// }
 		chart = new ParCoords(ballData, "test", (d) => {
 			return d["Weekly Reach Dx"] >= 0 ? "#82CAFF" : "#FFB682";
-		});
+		}, ["Structure"]);
 		chart.chart.on("brush", selection => {
 			let structures = _.map(selection, s => {return s.Structure;});
 			av.filter(structures);
@@ -279,7 +313,9 @@ window.onload = function(){
 
 
 
-}
+	}
+
+	loadCountryDatas();
 
 
 };

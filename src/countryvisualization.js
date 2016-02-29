@@ -15,7 +15,7 @@ export default class CountryVisualization{
 	}
 
 
-	constructor(canvas, type, specData, genericData){
+	constructor(canvas, type, specData){
 		this.currentFilters = {};
 		this.type = type;
 		this.specData = specData;
@@ -26,8 +26,8 @@ export default class CountryVisualization{
 		// background.fillColor = "black";
 
 		paper.view.zoom = 0.7;
-		this.visStudio = new VisualisationStudio(genericData);
-		this.balls = this._createBalls(specData);
+		this.visStudio = new VisualisationStudio();
+		this.balls = this._createBalls(specData, type);
 		console.log(this.balls);
 		paper.view.draw();
 	}
@@ -41,22 +41,9 @@ export default class CountryVisualization{
 		}else{
 			toHighlight.highlighted = true;
 		}
-		console.log(toHighlight);
 		toHighlight.highlight(toHighlight.highlighted);
 	}
 
-	update(newSpecData, genericData){
-
-		let currentStructures = this._getType(this.specData, this.type);
-		let newStructures = this._getType(newSpecData, this.type);
-		let difference = _.difference(newStructures, currentStructures);
-
-
-
-		for(let ball of this.balls){
-			ball.data = specData;
-		}
-	}
 
 	_checkFilter(ball){
 		for(let prop in this.currentFilters){
@@ -81,19 +68,8 @@ export default class CountryVisualization{
 		}
 	}
 
-	// filter(prop, value){
-	// 	this.currentFilters[prop] = value;
-	// 	for(let ball of this.balls){
 
-	// 		if(!this._checkFilter(ball)){
-	// 			ball.setVisibility(false);
-	// 		}else{
-	// 			ball.setVisibility(true);
-	// 		}
-	// 	}
-	// }
-
-	_createBalls(specData){
+	_createBalls(specData, type){
 		// console.log(specData);
 		let maxRange = 500;
 		let tracks = specData.length > 1 ? specData.length : specData[0].length;
@@ -105,7 +81,7 @@ export default class CountryVisualization{
 					if(this.type === "country"){
 						row[this.type] = CountryCodes.getName(row[this.type], "en");
 					}
-					balls.push(this._createBall(i, trackRadiusDiff, row));
+					balls.push(this._createBall(i, trackRadiusDiff, row, type));
 				}
 			}	
 		}else{
@@ -122,10 +98,10 @@ export default class CountryVisualization{
 		paper.view.zoom += newZoom;
 	}
 
-	_createBall(i, trackRadiusDiff, country){
+	_createBall(i, trackRadiusDiff, country, type){
 		let r = i*trackRadiusDiff;
 		let pos = randomPointOnCircle(r, paper.view.center, 0);
-		let ball = new DataBall(country, pos);
+		let ball = new DataBall(country, pos, type);
 		return ball;
 	}
 

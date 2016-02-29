@@ -16,6 +16,31 @@
  <script src="./build/bundle.js"></script>
 
  <div class="container-fluid">
+ <div class="row">
+    <div class="col-sm-6 col-sm-offset-6">
+        <h1 class="header">Usage</h1>
+        <p>
+        Click on Countries or Demographics to get an ambient visualization of the the reach and like data for either countries or demographics. The parallell coordinates, table, and ambient visualisation all brush. This means you can filter the table and visualisation with the parallel coordinates, you can also use the table to highlight things in the parallell coordinates and visualisation. The ambient visualisation is not interactive in itself. The slider underneath the buttons is a timeline and can be used to select data from any date.
+        <br>
+        <br>
+        You can zoom the ambient visualisation with "Z" and "X" if you need to resize it.
+        </p>
+        <p>
+        Posts and Generic are presented as parallell coordinates with a data table. This is to be able to view more specific information about the facebook group.
+        </p>
+        <h2>Mappings</h2>
+        <ul>
+        <li>Blue line: Increase in reach</li>
+        <li>Red line: Decrease in reach</li>
+        <li>Speed: Amount of increase/decrease</li>
+        <li>Direction: Counterclockwise = decrease in reach, clockwise = increase in reach</li>
+        <li>Distance from center: Total weekly reach(lower = closer)</li>
+        <li>Size of ball: lifetime total likes</li>
+        <li>Shockwaves: Rate scales with gained like in the last week</li>
+        </ul>
+        </p>
+        </div>
+ </div>
 <div class="row" style="height:80%">
     <div id="specificData" class="modal fade" role="dialog">
         <div class="modal-dialog" style="width:100%">
@@ -24,9 +49,18 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Modal Header</h4>
+                <h4 class="modal-title">Detailed data</h4>
             </div>
             <div class="modal-body">
+                <p>
+                For generic data color maps to daily engaged users where red is low, and blue is high.
+                </p>
+                <p>
+                For post data color scales with the type of the post.
+                </p>
+                <p>
+                The table is linked to the parallell coordinates. Hovering a row in the table will highlight the corresponding line in the parallell coordinates.
+                </p>
                <div id="genericDataDiv" class="parcoords" style="width:100%; height:40%">
                </div>
                <div id="genericDataTableDiv">
@@ -44,23 +78,33 @@
     </div>
     <div class="col-sm-6 affix" style="bottom:0; left:0">
         <div id="canvasDiv">
-        <canvas id="myCanvas"> </canvas>
+
+        <canvas id="myCanvas" style="height:85%;"> </canvas>
             <div id="filters">
                 <div id="viewStructures">
-                    <button id='countries'>Countries</button>
-                    <button id='cities'>Cities</button>
-                    <button id='demographics'>Demographics</button>
+                <div id="buttons" class="row">
+                <div id="indexed" class="col-sm-6">
+
+                    <button class="btn btn-default" id='countries'>Countries</button>
+                    <button class="btn btn-default" id='cities'>Cities</button>
+                    <button class="btn btn-default" id='demographics'>Demographics</button>
+                    </div>
+                    <div id="specific" class="col-sm-6">
+                    Opens popup
                     <button id='posts' type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#specificData">Posts</button>
                     <button id='generics' type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#specificData">Generic</button>
+                    </div>
+                </div>  
 
                 </div>
+                <h3>Timeline</h3>
                 <div id="currentTime"></div><div id="hoverDate"></div>
                 <input type="range" id="timelineFilter"></input>
         </div> 
     </div>
     </div>
-    <div class="col-sm-6 col-sm-offset-6" style="width=100%">
-        <div id="test" class="parcoords" style="height:80%"></div>
+    <div class="col-sm-6 col-sm-offset-6">
+        <div id="test" class="parcoords" style="height: 50%"></div>
         <div id="dataTableDiv">
             <h1>Data</h1>
             <table class="table table-bordered" id="structureTable"></table>
