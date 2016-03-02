@@ -28,14 +28,17 @@ export default class CountryVisualization{
 		paper.view.zoom = 0.7;
 		this.visStudio = new VisualisationStudio();
 		this.balls = this._createBalls(specData, type);
-		console.log(this.balls);
 		paper.view.draw();
 	}
 
-	highlightBall(id){
+
+	highlightBall(id, val){
 		let toHighlight = _.filter(this.balls, ball => {
 				return ball.path.data[this.type] === id;
 			})[0];
+		if(val !== undefined){
+			toHighlight.highlight(val);
+		}
 		if(toHighlight.highlighted === true){
 			toHighlight.highlighted = false;
 		}else{
@@ -70,7 +73,6 @@ export default class CountryVisualization{
 
 
 	_createBalls(specData, type){
-		// console.log(specData);
 		let maxRange = 500;
 		let tracks = specData.length > 1 ? specData.length : specData[0].length;
 		let trackRadiusDiff = maxRange/tracks+1;

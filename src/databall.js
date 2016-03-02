@@ -51,7 +51,6 @@ export default class DataBall{
 		textName.content = data[type];
 		textName.visible = false;
 		this.path.textName = textName;
-		// console.log(this.path.data.rotationSpeed);
 	}
 
 	highlight(val){

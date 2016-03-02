@@ -17,7 +17,6 @@ export default class ParCoords{
         if(!useless){
             useless = [];
         }
-        console.log(useless);
 
         var pc1;
 

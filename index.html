@@ -18,28 +18,7 @@
  <div class="container-fluid">
  <div class="row">
     <div class="col-sm-6 col-sm-offset-6">
-        <h1 class="header">Usage</h1>
-        <p>
-        Click on Countries or Demographics to get an ambient visualization of the the reach and like data for either countries or demographics. The parallell coordinates, table, and ambient visualisation all brush. This means you can filter the table and visualisation with the parallel coordinates, you can also use the table to highlight things in the parallell coordinates and visualisation. The ambient visualisation is not interactive in itself. The slider underneath the buttons is a timeline and can be used to select data from any date.
-        <br>
-        <br>
-        You can zoom the ambient visualisation with "Z" and "X" if you need to resize it.
-        </p>
-        <p>
-        Posts and Generic are presented as parallell coordinates with a data table. This is to be able to view more specific information about the facebook group.
-        </p>
-        <h2>Mappings</h2>
-        <ul>
-        <li>Blue line: Increase in reach</li>
-        <li>Red line: Decrease in reach</li>
-        <li>Speed: Amount of increase/decrease</li>
-        <li>Direction: Counterclockwise = decrease in reach, clockwise = increase in reach</li>
-        <li>Distance from center: Total weekly reach(lower = closer)</li>
-        <li>Size of ball: lifetime total likes</li>
-        <li>Shockwaves: Rate scales with gained like in the last week</li>
-        </ul>
-        </p>
-        </div>
+
  </div>
 <div class="row" style="height:80%">
     <div id="specificData" class="modal fade" role="dialog">
@@ -76,10 +55,10 @@
   </div>
 
     </div>
-    <div class="col-sm-6 affix" style="bottom:0; left:0">
+    <div id="ambientDiv" class="col-sm-6 affix" style="bottom:0; left:0">
         <div id="canvasDiv">
 
-        <canvas id="myCanvas" style="height:85%;"> </canvas>
+        <canvas id="myCanvas" style="height:85%;" resize="true"> </canvas>
             <div id="filters">
                 <div id="viewStructures">
                 <div id="buttons" class="row">
@@ -88,22 +67,60 @@
                     <button class="btn btn-default" id='countries'>Countries</button>
                     <button class="btn btn-default" id='cities'>Cities</button>
                     <button class="btn btn-default" id='demographics'>Demographics</button>
+                    <!-- <button class="btn btn-default" id='details'>Details</button> -->
+
                     </div>
                     <div id="specific" class="col-sm-6">
                     Opens popup
                     <button id='posts' type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#specificData">Posts</button>
-                    <button id='generics' type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#specificData">Generic</button>
+                    <button id='generics' type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#specificData">Generic Wall data</button>
                     </div>
                 </div>  
 
                 </div>
-                <h3>Timeline</h3>
-                <div id="currentTime"></div><div id="hoverDate"></div>
+                <h4>Timeline</h4>
+                <h1 id="currentTime"></h1><div id="hoverDate"></div>
                 <input type="range" id="timelineFilter"></input>
         </div> 
     </div>
     </div>
-    <div class="col-sm-6 col-sm-offset-6">
+    <div id="detailsDiv" class="col-sm-6 col-sm-offset-6">
+    	<h1>Visualization of the Visualization studios evolution over time and space</h1>
+    	<h2 class="header">Usage</h2>
+    	<p>
+    		Click on Countries or Demographics to get an ambient visualization of the the reach and like data for either countries or demographics. The parallell coordinates, table, and ambient visualisation all interact. This means you can filter the table and visualisation with the parallel coordinates, you can also use the table to highlight things in the parallell coordinates and visualisation. The ambient visualisation is not interactive in itself. The slider underneath the buttons is a timeline and can be used to select data from any date.  The animation will progress to the next day every hour. Optimally it would visualize show the previous day for 24 hours(however that data is not currently available).
+    		<br>
+    		<br>
+    		You can zoom the ambient visualisation with "Z" and "X" if you need to resize it.
+    	</p>
+    	<p>
+    		Posts and Generic are presented as parallell coordinates with a data table. This is to be able to view more specific information about the facebook group.
+    	</p>
+    	<h2>Mappings</h2>
+    	<ul>
+    		<li>Blue line: Increase in reach</li>
+    		<li>Red line: Decrease in reach</li>
+    		<li>Speed: Amount of increase/decrease</li>
+    		<li>Direction: Counterclockwise = decrease in reach, clockwise = increase in reach</li>
+    		<li>Distance from center: Total weekly reach(lower = closer)</li>
+    		<li>Size of ball: lifetime total likes</li>
+    		<li>Shockwaves: Rate scales with gained like in the last week</li>
+    	</ul>
+    	<h2>Design Brief (355 words, I really was unable to shorten it sorry.)</h2>
+    	<p>
+    	I chose to focus mainly on the data related to locations and demographics. It turned out that this data really only had three dimensions: reach, people talking about this, and likes. I chose to only use reach and likes, since people talking like this was very similar to the other two. I also extrapolated two more dimensions, the weekly increase in likes and reach.
+    	</p>
+    	<p>
+    	The visualization should provide a useful overview of the data from a glance(awareness of the state of the studio[CIV]), while still being interesting visually(i.e be able to put in a frame on a wall in the viz studio). I went against the advise of [BAU], and went with my own artistic abilities to create the visualization. To accomplish this I came up with a simple radial layout in which small points would represent the current data type being visualized(country/demographic). The distance from the center is mapped to reach as a nice metaphor for "distance on facebook". The size of the dots represent the lifetime likes("How big are they on my facebook page").
+    	</p>
+    	<p>
+    	The trails and lines toward the center are redundant mappings for the weekly reach increase to be make easier to discern movement. I noticed slow moving balls were hard to see. The lines incidentally make the distance easier to discern as well. The lines were also implemented for purely artistic reasons(Increases visual complexity). The mappings are constant and has a lot of redundancy allowing for easier reading[BAU]. The redundancy also allows less knowledgable users to appreciate the visualization at a glance[CIV]
+    	</p>
+    	<p>Movement was implemented to grab the users attention and make feel more alive[BAU]. The speed and direction of the balls are mapped to the weekly increase/decrease in reach. The increase in likes is mapped to the rate of which the balls emit small shockwaves(they just look neat). These mappings were chosen since movement and change are similar to eachother. The colors are the tried and true blue/orange complementary colors, where a redder collor will be seen as more negative than a light blue one. The color of the balls is a purely aesthetic choice.
+    	</p>
+    	<p>
+    	[BAU] - <a>http://m.cottonlion.com/viktoria/infoart/pub/ambient-infovis.pdf</a> <br>
+    	[CIV] - <a>http://innovis.cpsc.ucalgary.ca/innovis/uploads/Courses/InformationVisualizationDetails2009/Pousman2007.pdf</a>
         <div id="test" class="parcoords" style="height: 50%"></div>
         <div id="dataTableDiv">
             <h1>Data</h1>

@@ -4,7 +4,6 @@ import $ from 'jquery';
 import {resturl} from './resturl.js';
 import Rx from 'rx';
 import _ from 'lodash';
-import CountryCodes from 'i18n-iso-countries';
 
 export default class DataFetcher{
 
@@ -39,7 +38,6 @@ export default class DataFetcher{
 						t[0].lifetime_likes_dx = t[0].lifetime_likes - t[1].lifetime_likes;
 						t[0].weekly_reach_dx = t[0].weekly_reach - t[1].weekly_reach;
 					}
-					// t[0][this.routeToType[route]] = CountryCodes.getName(t[0][this.routeToType[route]], "en");
 					return t[0];
 				})
 				.groupBy(t => {
@@ -97,7 +95,6 @@ export default class DataFetcher{
 
 
 	_doRequest(dataType){
-		console.log(resturl+dataType);
 		return Rx.Observable.fromPromise($.ajax({
 			url: resturl+dataType,
 			type: 'GET',

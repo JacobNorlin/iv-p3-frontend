@@ -58,6 +58,12 @@ window.onload = function(){
 	timeline.max = dayRange;
 
 
+	$("#details").on('click', () => {
+		$("#ambientDiv").toggleClass("col-sm-6");
+		let dd = $("#detailsDiv")
+		dd.toggle();
+	})
+
 	function getDate(day){
 		let ms = firstDate+day*oneDay;
 		let date = new Date(ms);
@@ -68,6 +74,19 @@ window.onload = function(){
 	var currentRoute = ds.routes.getCountryDatas;
 	var currentSelectedDate = "2015-03-10";
 
+	setInterval(loadNextDay, 60000*60);
+
+	function loadNextDay(){
+		let tl = $("#timelineFilter");
+		let nextVal = parseInt(tl.val())+1	;
+		tl.val(nextVal);
+		tl.trigger("change");
+	}
+	$("#timelineFilter").on("change", () => {
+		let val = parseInt($("#timelineFilter").val());
+		let date = getDate(val);
+		ds.getDxData(currentRoute, date).subscribe(foo);
+	})
 
 	timeline.oninput = (e) => {
 		timeNumber.innerHTML = getDate(e.srcElement.value);
@@ -145,7 +164,8 @@ window.onload = function(){
 				"Video": "#ff7f0e",
 				"Link": "#2ca02c",
 				"Status": "#d62728"
-			};
+			}
+		
 			let useless = ["post_message", "posted", "post_id"];
 			let plotData = _(data).map(row => {return _.omit(row, ["permalink", "post_key"]);}).value();
 			genericTable = setUpTable("genericDataTable", plotData);
@@ -177,15 +197,15 @@ window.onload = function(){
 		ds.getDxData(currentRoute, currentSelectedDate).subscribe(foo, "demographic");
 	}
 
-	let timelineChange = Rx.Observable.fromEvent(timeline, 'change')
-	.map(event => {
-		return event.srcElement.value;
-	})
-	.map(getDate)
-	.flatMap(date => {
-		return ds.getDxData(currentRoute, date);
-	})
-	.subscribe(foo);
+	// let timelineChange = Rx.Observable.fromEvent(timeline, 'change')
+	// .map(event => {
+	// 	return event.srcElement.value;
+	// })
+	// .map(getDate)
+	// .flatMap(date => {		
+	// 	return ds.getDxData(currentRoute, date);
+	// })
+	// .subscribe(foo);
 
 
 	function createDataRow(structure, likes, likesdx, reach, reachdx){
